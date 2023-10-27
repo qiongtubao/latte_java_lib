@@ -3,6 +3,7 @@ package latte.lib.db;
 import latte.lib.json.JacksonJson;
 import latte.lib.json.Json;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,15 +48,18 @@ public abstract class SqlDao<T> implements Dao<T> {
 
         Map<String, Object> map = parseToMap(t);
         String gen = generateQuestionMarks(map.size(), "?", ",");
-        String sql = String.format("INSERT INTO %s (%s) values (%s)", getTableName(), gen, gen);
-        Object[] params = new Object[2* map.size()];
+
+        Object[] params = new Object[map.size()];
+        List<String> keys = new ArrayList<>();
+
         int i = 0;
         for(Map.Entry<String,Object> entry: map.entrySet()) {
-            params[i] = entry.getKey();
-            params[i + map.size()] = entry.getValue();
+            keys.add(entry.getKey());
+            params[i] = entry.getValue();
             i++;
         }
-        System.out.println("sql:" + sql + ",params:" +  params[0] + "," +params[1] + "," + params[2] + "," + params[3]);
+
+        String sql = String.format("INSERT INTO %s (%s) values (%s)", getTableName(), String.join(",", keys), gen);
         impl.execSQL(sql, params);
     }
 
@@ -63,52 +67,65 @@ public abstract class SqlDao<T> implements Dao<T> {
     public void update(T t) throws Exception {
         Map<String, Object> map = parseToMap(t);
         List<String> key = getKey();
-        String sql = String.format("UPDATE %s SET %s WHERE %s",
-                getTableName(),
-                generateQuestionMarks(map.size() - key.size(), "? = ?", ","),
-                generateQuestionMarks(key.size(), "? = ?", "and"));
-        Object[] params = new Object[2* map.size()];
+
+        Object[] params = new Object[map.size()];
         params[0] = getTableName();
         int param_index = 0;
-        int key_index = (map.size() - key.size()) * 2;
+        int key_index = (map.size() - key.size());
+        List<String> setKeys = new ArrayList<>();
+        List<String> whereKeys = new ArrayList<>();
         for(Map.Entry<String,Object> entry: map.entrySet()) {
             if (key.contains(entry.getKey())) {
-                params[key_index++] = entry.getKey();
+                whereKeys.add(entry.getKey() + " = ?");
                 params[key_index++] = entry.getValue();
             } else {
-                params[param_index++] = entry.getKey();
+                setKeys.add(entry.getKey() + " = ?");
                 params[param_index++] = entry.getValue();
             }
         }
+        String sql = String.format("UPDATE %s SET %s WHERE %s",
+                getTableName(),
+                String.join(",", setKeys),
+                String.join("and", whereKeys));
+        System.out.println("sql:" + sql);
         impl.execSQL(sql, params);
     }
     
     public T find(T t) throws Exception {
-        Map<String, Object> map = parseToMap(t);
-        String sql = String.format("select * from %s  WHERE %s",
-                getTableName(), 
-                generateQuestionMarks(map.size(), "? = ?", "and"));
-        Object[] params = new Object[2* map.size()];
+        return find(parseToMap(t), (Class<T>)t.getClass());
+    }
+
+    public T find(Map<String, Object> map, Class<T> glass) throws  Exception {
+        Object[] params = new Object[map.size()];
+        List<String> keys = new ArrayList<>();
         int param_index = 0;
         for(Map.Entry<String,Object> entry: map.entrySet()) {
-            params[param_index++] = entry.getKey();
+            keys.add(entry.getKey() + "= ?");
             params[param_index++] = entry.getValue();
         }
-        return impl.execSQLToObject(sql, params, (Class<T>)t.getClass());
+        String sql = String.format("select * from %s  WHERE %s",
+                getTableName(),
+                String.join(" and ", keys));
+        System.out.println("sql:" + map);
+        List<T> ts =  impl.execSQLToObject(sql, params, glass);
+        if (ts.size() == 0) return null;
+        return ts.get(0);
     }
 
     @Override
     public void del(T t) throws Exception {
         Map<String, Object> map = parseToMap(t);
-        String sql = String.format("delete from %s WHERE %s",
-                getTableName(),
-                generateQuestionMarks(map.size(), "? = ?", "and"));
-        Object[] params = new Object[2* map.size()];
+
+        Object[] params = new Object[map.size()];
+        List<String> keys = new ArrayList<>();
         int param_index = 0;
         for(Map.Entry<String,Object> entry: map.entrySet()) {
-            params[param_index++] = entry.getKey();
+            keys.add(entry.getKey() + " = ?");
             params[param_index++] = entry.getValue();
         }
+        String sql = String.format("delete from %s WHERE %s",
+                getTableName(),
+                String.join(" and ", keys));
         impl.execSQL(sql, params);
     }
 }

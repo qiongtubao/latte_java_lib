@@ -1,13 +1,11 @@
 package latte.lib.db.impls;
 
-import latte.lib.db.SqlDao;
 import latte.lib.db.SqlImpl;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
+import java.util.List;
 
 public class SpringJdbcImpl implements SqlImpl {
     private JdbcTemplate template;
@@ -17,11 +15,12 @@ public class SpringJdbcImpl implements SqlImpl {
 
     @Override
     public void execSQL(String sql, Object... params) {
-        template.update(sql, params[0], params[1], params[2], params[3]);
+        template.update(sql, params);
     }
 
+
     @Override
-    public <T> T execSQLToObject(String sql, Object[] params, Class<T> t) {
-        return template.queryForObject(sql, params, new BeanPropertyRowMapper<T>(t));
+    public <T> List<T> execSQLToObject(String sql, Object[] params, Class<T> t) {
+        return template.query(sql, params, new BeanPropertyRowMapper<T>(t));
     }
 }

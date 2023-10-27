@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface SqlImpl {
     void execSQL(String sql, Object... params);
-    <T>  T execSQLToObject(String sql, Object[] params, Class<T> t)  throws Exception;
+    <T>  List<T> execSQLToObject(String sql, Object[] params, Class<T> t)  throws Exception;
 
     default PreparedStatementSetter getSetter(Object... params) {
         PreparedStatementSetter setter = (preparedStatement) -> {
