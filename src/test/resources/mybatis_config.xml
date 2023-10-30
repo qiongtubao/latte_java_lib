@@ -15,8 +15,11 @@
         </environment>
     </environments>
 
+<!--    <mappers>-->
+<!--        &lt;!&ndash; 类映射&ndash;&gt;-->
+<!--        <mapper resource="mybatis_user_map.xml"/>-->
+<!--    </mappers>-->
     <mappers>
-        <!-- 类映射-->
-        <mapper resource="mybatis_user_map.xml"/>
+        <mapper class="latte.lib.db.example.impls.UserMapper" />
     </mappers>
 </configuration>
