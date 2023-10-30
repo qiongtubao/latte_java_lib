@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="latte.lib.db.example.impls.UserMapper">
+    <insert id="createUserTable" parameterType="java.lang.Void">
+        Create table `user_tbl` (id int primary key AUTO_INCREMENT, name varchar(50), age int) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </insert>
+    <select id="getAllEntities" resultType="latte.lib.db.example.User">
+        SELECT * FROM user_tbl
+    </select>
+    <select id="insertEntity" resultType="latte.lib.db.example.User">
+        INSERT INTO user_tbl (name, age) VALUES (#{name}, #{age})
+    </select>
+   
+</mapper>
