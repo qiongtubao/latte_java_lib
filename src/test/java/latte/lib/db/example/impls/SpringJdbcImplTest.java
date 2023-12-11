@@ -2,6 +2,7 @@ package latte.lib.db.example.impls;
 
 
 import com.google.inject.internal.util.Maps;
+import latte.lib.db.SqlImpl;
 import latte.lib.db.example.User;
 import latte.lib.db.example.UserDao;
 import latte.lib.db.impls.SpringJdbcImpl;
@@ -17,45 +18,24 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import java.util.List;
 import java.util.Map;
 
-public class SpringJdbcImplTest {
+public class SpringJdbcImplTest extends SqlTest {
     UserDao dao;
     EmbeddedDatabase database;
 
-    @Before
-    public void init() {
-
+    @Override
+    SqlImpl createSqlImpl() {
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
         database = builder
                 .setType(EmbeddedDatabaseType.H2)
                 .addScript("user_tbl.sql")  // 可选：初始化数据库表结构的SQL脚本
                 .build();
-        dao = new UserDao();
-        dao.setImpl(new SpringJdbcImpl(database));
+        return new SpringJdbcImpl(database);
     }
+
     
     @Test
     public void insert() throws Exception {
-        
-        
-        User user = new User();
-        user.setName("zgd");
-        user.setAge(100);
-        dao.insert(user);
-
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("name","zgd");
-        User user1 = dao.find(map, User.class);
-        Assert.assertTrue(user1.getId() == 1);
-        Assert.assertTrue(user1.getAge() == 100);
-        user1.setAge(200);
-        dao.update(user1);
-        User user2 = dao.find(map, User.class);
-        Assert.assertTrue(user2.getAge() == 200);
-
-        dao.del(user2);
-
-        User user3 = dao.find(map, User.class);
-        Assert.assertEquals(user3, null);
+       super.insert();
     }
 
     @Test

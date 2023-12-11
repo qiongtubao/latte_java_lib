@@ -1,5 +1,7 @@
 package latte.lib.db.example.impls;
 
+import com.google.inject.internal.util.Maps;
+import latte.lib.db.SqlImpl;
 import latte.lib.db.example.User;
 import latte.lib.db.example.UserDao;
 import latte.lib.db.impls.MyBatisImpl;
@@ -8,6 +10,7 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -17,23 +20,27 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
-public class MyBatisImplTest {
+/**
+ *  目前还无法对融入原来自动化。我居然还觉得mybatis还挺好用的
+ */
+public class MyBatisImplTest extends SqlTest {
     UserDao dao;
     EmbeddedDatabase database;
-    @Before
-    public void init() throws IOException {
+
+    @Override
+    SqlImpl createSqlImpl() throws IOException {
         InputStream inputStream = Resources.getResourceAsStream("mybatis_config.xml");
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
         // 创建 SqlSession
         SqlSession sqlSession = sqlSessionFactory.openSession();
-        dao = new UserDao();
-        dao.setImpl(new MyBatisImpl(sqlSession));
+        return new MyBatisImpl(sqlSession);
     }
     @Test
     public void insert() throws Exception {
-
+        super.insert();
     }
     @Test
     public void base() throws IOException {
