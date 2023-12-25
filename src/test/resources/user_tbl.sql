@@ -1,1 +1,0 @@
-Create table user_tbl (id int primary key AUTO_INCREMENT, name varchar(50), age int);
