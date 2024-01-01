@@ -11,6 +11,9 @@
     <modules>
         <module>tikv_launcher</module>
         <module>tikv</module>
+        <module>redis</module>
+        <module>stablize-test</module>
+        <module>common</module>
     </modules>
 
     <properties>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" packages="com.ctrip.framework.triplog.shaded.client.appender">
+    <Properties>
+        <Property name="app">tikv-statblize-test</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[${app}][%d][%p] - %m%n"/>
+        </Console>
+        <Async name="Async" includeLocation="true">
+            <AppenderRef ref="Console"/>
+        </Async>
+        <RollingFile name="RollingFileInfo" fileName="logs/${app}.log"
+                     filePattern="logs/${app}-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy/MM/dd-HH:mm:ss.SSS} %-5p [%t] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="2">
+                <Delete basePath="logs" maxDepth="1" followLinks="true">
+                    <IfFileName glob="${app}-*.log"/>
+                    <IfLastModified age="7D"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <TripLog4j2Appender name="clogAppender4Log4j2"/>
+    </Appenders>
+    <Loggers>
+        <Logger name="com" level="INFO">
+            <AppenderRef ref="RollingFileInfo"/>
+            <appender-ref ref="clogAppender4Log4j2"/>
+        </Logger>
+        <Root level="WARN">
+            <AppenderRef ref="Async"/>
+        </Root>
+    </Loggers>
+</Configuration>

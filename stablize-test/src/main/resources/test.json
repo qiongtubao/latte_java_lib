@@ -1,0 +1,14 @@
+{
+
+  "tasks": {
+    "redis": {
+      "redisSetex": {
+        "threads": 10,
+        "host": "127.0.0.1",
+        "port": 6379
+      }
+    }
+  },
+  "executorNum": 10,
+  "scheduledNum": 10
+}
