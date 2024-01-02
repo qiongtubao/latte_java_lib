@@ -10,9 +10,9 @@ import latte.lib.stablize.task.TaskConfig;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class SetexTask extends AbstractUnlimitedTask {
+public class CreateTombstoneTask extends AbstractUnlimitedTask {
     RedisClient client;
-    public SetexTask(String host, int port, int threadnum, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService)  {
+    public CreateTombstoneTask(String host, int port, int threadnum, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService)  {
         super(threadnum, scheduledExecutorService, executorService);
         RedisConfig config = new RedisConfig();
         config.setPoolMaxTotal(threadnum);
@@ -25,8 +25,11 @@ public class SetexTask extends AbstractUnlimitedTask {
                 config);
     }
 
+
     @Override
     public void doTest() {
-        client.setex(RandomUtils.randomString(5), 1000, "v");
+        String key = RandomUtils.randomString(5);
+        client.set(key, "v");
+        client.del(key);
     }
 }

@@ -11,7 +11,7 @@ import java.util.Map;
 @Getter
 public class TaskConfig {
     String name;
-    Map<String,String> configs = new LinkedHashMap<>();
+    Map<String,String> configs;
 
     public TaskConfig() {
 
@@ -20,6 +20,7 @@ public class TaskConfig {
     public <T>  T getConfig(String key, Class<T> t) throws Exception {
         String v = configs.get(key);
         if (v == null) return null;
+        if (t.equals(String.class)) return (T)v;
         return JsonUtils.decode(v, t);
     }
 }

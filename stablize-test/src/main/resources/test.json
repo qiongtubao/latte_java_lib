@@ -1,14 +1,20 @@
 {
-
   "tasks": {
-    "redis": {
-      "redisSetex": {
-        "threads": 10,
+    "redis": [{
+      "name": "createTombstone",
+      "configs": {
+        "threads": "18",
         "host": "127.0.0.1",
-        "port": 6379
+        "port": "6379"
       }
-    }
+    }, {
+      "name": "monitorGc",
+      "configs": {
+        "host": "127.0.0.1",
+        "port": "6379"
+      }
+    }]
   },
-  "executorNum": 10,
-  "scheduledNum": 10
+  "executorNum": 20,
+  "scheduledNum": 20
 }

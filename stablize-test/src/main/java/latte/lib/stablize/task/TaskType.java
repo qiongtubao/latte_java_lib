@@ -1,15 +1,24 @@
 package latte.lib.stablize.task;
 
-import latte.lib.stablize.task.impl.redis.SetexTask;
+import latte.lib.stablize.task.impl.redis.CreateTombstoneTask;
+import latte.lib.stablize.task.impl.redis.MonitorGcTask;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 public enum TaskType {
-    RedisSetex("redisSetex") {
+    MonitorGc("monitorGc") {
         @Override
         Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception {
-            return new SetexTask(
+            return new MonitorGcTask(taskConfig.getConfig("host", String.class),
+                    taskConfig.getConfig("port", int.class),
+                    scheduledExecutorService, executorService);
+        }
+    },
+    CreateTombstone("createTombstone") {
+        @Override
+        Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception {
+            return new CreateTombstoneTask(
                     taskConfig.getConfig("host", String.class),
                     taskConfig.getConfig("port", int.class),
                     taskConfig.getConfig("threads", Integer.class),

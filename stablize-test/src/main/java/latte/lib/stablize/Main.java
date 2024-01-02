@@ -45,7 +45,6 @@ public class Main {
             }
 
         } catch (Exception e) {
-            System.out.println("config decode wrong !");
             e.printStackTrace();
         }
     }
