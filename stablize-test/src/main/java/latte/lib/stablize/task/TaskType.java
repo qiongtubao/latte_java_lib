@@ -2,11 +2,23 @@ package latte.lib.stablize.task;
 
 import latte.lib.stablize.task.impl.redis.CreateTombstoneTask;
 import latte.lib.stablize.task.impl.redis.MonitorGcTask;
+import latte.lib.stablize.task.impl.tikv.OneKeyConflictTask;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 public enum TaskType {
+    OneKeyConflict("tikvOneKeyConflict") {
+        @Override
+        Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception {
+            return new OneKeyConflictTask(
+                    taskConfig.getConfig("threads", Integer.class),
+                    taskConfig.getConfig("host", String.class),
+                    taskConfig.getConfig("port", int.class),
+                    taskConfig.getConfig("conflictCount", Integer.class),
+                    scheduledExecutorService, executorService);
+        }
+    },
     MonitorGc("monitorGc") {
         @Override
         Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception {

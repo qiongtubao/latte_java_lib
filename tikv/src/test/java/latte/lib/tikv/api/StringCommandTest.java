@@ -13,16 +13,17 @@ import java.util.concurrent.Executors;
 
 public class StringCommandTest {
 
+    String pdAddr = "127.0.0.1:12379";
     @Test
     public void set_test() {
-        StringCommand client = KVClientFactory.getKVClientByClusterName("local");
+        StringCommand client = KVClientFactory.getKVClient(pdAddr);
         client.set("aa", "bb");
         Assert.assertEquals("bb",client.get("aa"));
     }
 
     @Test
     public void mset_test() {
-        StringCommand client = KVClientFactory.getKVClientByClusterName("local");
+        StringCommand client = KVClientFactory.getKVClient(pdAddr);
         client.mset("aa", "v1", "bb", "v11");
         List<String> values = client.mget("aa", "bb");
         Assert.assertEquals(2, values.size());

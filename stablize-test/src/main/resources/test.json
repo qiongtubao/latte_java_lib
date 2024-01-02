@@ -1,17 +1,12 @@
 {
   "tasks": {
-    "redis": [{
-      "name": "createTombstone",
-      "configs": {
-        "threads": "18",
-        "host": "127.0.0.1",
-        "port": "6379"
-      }
-    }, {
-      "name": "monitorGc",
+    "tikv": [{
+      "name": "tikvOneKeyConflict",
       "configs": {
         "host": "127.0.0.1",
-        "port": "6379"
+        "port": "12379",
+        "threads": 1,
+        "conflictCount": 2
       }
     }]
   },

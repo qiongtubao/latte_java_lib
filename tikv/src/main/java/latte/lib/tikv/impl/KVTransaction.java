@@ -48,6 +48,7 @@ public class KVTransaction extends AbstractTransactionCommands {
         this.session = session;
         this.client = session.createTxnClient();
         this.version = client.getTimestamp().getVersion();
+        System.out.println(Thread.currentThread().getName() + " start tm " + this.version);
         this.readClient = session.createKVClient();
     }
     @Override
@@ -85,7 +86,7 @@ public class KVTransaction extends AbstractTransactionCommands {
         }
         twoPhaseCommitter.prewriteSecondaryKeys(primaryKey, pairs.iterator(), config.getBackOfferMs());
         long commitVersion = session.getTimestamp().getVersion();
-
+        System.out.println(Thread.currentThread().getName() + " commit tm " + commitVersion);
         twoPhaseCommitter.commitPrimaryKey(backOffer, primaryKey, commitVersion);
         twoPhaseCommitter.commitSecondaryKeys(keys.iterator(), commitVersion, config.getBackOfferMs());
 
