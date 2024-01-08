@@ -1,8 +1,9 @@
 package latte.lib.redis;
 
 import latte.lib.redis.api.CommonCommand;
+import latte.lib.redis.api.HashCommand;
 import latte.lib.redis.api.StringCommand;
 
-public interface RedisClient extends StringCommand, CommonCommand {
+public interface RedisClient extends StringCommand, HashCommand, CommonCommand {
 
 }
