@@ -48,8 +48,9 @@ public interface CommonCommand {
      }
     enum ActionType {
         Keyspace,
-        replication,
-        stats;
+        Replication,
+        Stats,
+        Cpu;
 
     };
 
