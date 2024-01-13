@@ -1,6 +1,7 @@
 package latte.lib.tikv.api;
 
 
+import latte.lib.tikv.AbstractKVServer;
 import latte.lib.tikv.KVClientFactory;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,9 +12,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class StringCommandTest {
+public class StringCommandTest extends AbstractKVServer {
 
-    String pdAddr = "127.0.0.1:12379";
+
     @Test
     public void set_test() {
         StringCommand client = KVClientFactory.getKVClient(pdAddr);
