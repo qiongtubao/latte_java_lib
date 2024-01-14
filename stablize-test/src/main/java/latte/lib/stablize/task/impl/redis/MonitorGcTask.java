@@ -30,14 +30,14 @@ public class MonitorGcTask extends AbstractTimerTask {
 
     @Override
     public void doTest() {
-        CommonCommand.ActionTypeValue r = client.info(RedisType.CRDT, CommonCommand.ActionType.stats, "stat_gc_hits");
-        long gcHits = client.info(RedisType.CRDT, CommonCommand.ActionType.stats, "stat_gc_hits").getLong();
+        CommonCommand.ActionTypeValue r = client.info(RedisType.CRDT, CommonCommand.ActionType.Stats, "stat_gc_hits");
+        long gcHits = client.info(RedisType.CRDT, CommonCommand.ActionType.Stats, "stat_gc_hits").getLong();
         if (lastGCHits != 0) {
 //            logger.info("gc qps: {}", gcHits - lastGCHits);
             System.out.println("gc qps: " + (gcHits - lastGCHits));
         }
         lastGCHits = gcHits;
-        long ops = client.info(RedisType.NORMAL, CommonCommand.ActionType.stats, "instantaneous_ops_per_sec").getLong();
+        long ops = client.info(RedisType.NORMAL, CommonCommand.ActionType.Stats, "instantaneous_ops_per_sec").getLong();
 //        logger.info("ops:{}" , ops);
         System.out.println("ops: " + (ops/2));
     }

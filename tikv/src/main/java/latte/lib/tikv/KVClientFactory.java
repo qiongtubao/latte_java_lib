@@ -1,6 +1,7 @@
 package latte.lib.tikv;
 
 import latte.lib.tikv.impl.DefaultKVClient;
+import latte.lib.tikv.log.LatteSlowLog;
 import org.tikv.common.TiConfiguration;
 import org.tikv.common.TiSession;
 
@@ -8,6 +9,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class KVClientFactory {
+    static {
+        LatteSlowLog.region();
+    }
+
     static Map<String, TiSession> sessions = new LinkedHashMap<>();
     public static KVClient getKVClient(String pdAddr) {
         TiSession session = sessions.get(pdAddr);

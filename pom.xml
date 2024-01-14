@@ -14,6 +14,12 @@
         <module>redis</module>
         <module>stablize-test</module>
         <module>common</module>
+        <module>influxdb_launcher</module>
+        <module>redis_launcher</module>
+        <module>sql_launcher</module>
+        <module>mongodb_launcher</module>
+        <module>kafka_launcher</module>
+        <module>rocksdb_launcher</module>
     </modules>
 
     <properties>
