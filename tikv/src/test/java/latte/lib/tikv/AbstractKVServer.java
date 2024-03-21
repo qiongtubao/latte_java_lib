@@ -5,12 +5,12 @@ import org.junit.After;
 import org.junit.Before;
 
 public class AbstractKVServer {
-    public String pdAddr = "127.0.0.1:12379";
+    public String pdAddr = "127.0.0.1:12369";
     @Before
     public void before() throws Exception {
         if (!AllTests.startAllTest) {
-            TiKVComponents.getSingleton().startPd(12379);
-            TiKVComponents.getSingleton().startTiKV(30160, 12379);
+//            TiKVComponents.getSingleton().startPd(12369);
+//            TiKVComponents.getSingleton().startTiKV(30160, 12369);
         }
     }
 

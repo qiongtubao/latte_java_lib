@@ -5,6 +5,7 @@ import latte.lib.tikv.AbstractKVServer;
 import latte.lib.tikv.KVClientFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -18,8 +19,10 @@ public class StringCommandTest extends AbstractKVServer {
     @Test
     public void set_test() {
         StringCommand client = KVClientFactory.getKVClient(pdAddr);
-        client.set("aa", "bb");
-        Assert.assertEquals("bb",client.get("aa"));
+        for(char i = 'a'; i < 'z'; i++) {
+            client.set(String.valueOf(i), String.valueOf(Character.getNumericValue(i)));
+        }
+        Assert.assertEquals("10",client.get("a"));
     }
 
     @Test

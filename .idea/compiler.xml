@@ -7,7 +7,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="sql_launcher" />
+        <module name="common" />
         <module name="tikv" />
+        <module name="influxdb_launcher" />
+        <module name="kafka_launcher" />
+        <module name="rocksdb_launcher" />
+        <module name="stablize-test" />
+        <module name="redis_launcher" />
+        <module name="mongodb_launcher" />
+        <module name="redis" />
         <module name="tikv_launcher" />
       </profile>
     </annotationProcessing>
