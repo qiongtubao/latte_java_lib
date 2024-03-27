@@ -26,7 +26,7 @@ public class DefaultKVClient extends AbstractKVClient {
     public DefaultKVClient(TiSession session) {
         this.session = session;
     }
-    KVTransaction beginOptimistic() {
+    public KVTransaction beginOptimistic() {
         return new KVTransaction(session);
     }
     @Override

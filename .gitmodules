@@ -1,0 +1,3 @@
+[submodule "tikv/deps/client-java"]
+	path = tikv/deps/client-java
+	url = git@github.com:qiongtubao/client-java.git

@@ -9,8 +9,8 @@ public class AbstractKVServer {
     @Before
     public void before() throws Exception {
         if (!AllTests.startAllTest) {
-//            TiKVComponents.getSingleton().startPd(12369);
-//            TiKVComponents.getSingleton().startTiKV(30160, 12369);
+            TiKVComponents.getSingleton().startPd(12369);
+            TiKVComponents.getSingleton().startTiKV(30160, 12369);
         }
     }
 

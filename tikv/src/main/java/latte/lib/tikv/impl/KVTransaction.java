@@ -2,8 +2,12 @@ package latte.lib.tikv.impl;
 
 
 import latte.lib.tikv.api.transactional.TransactionEvent;
+import latte.lib.tikv.commiter.Committer;
+import latte.lib.tikv.commiter.KVTwoPhaseCommiter;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.tikv.common.BytePairWrapper;
 import org.tikv.common.ByteWrapper;
@@ -20,15 +24,20 @@ import org.tikv.txn.TxnKVClient;
 import java.util.*;
 
 public class KVTransaction extends AbstractTransactionCommands {
+    static Logger logger = LoggerFactory.getLogger(KVTransaction.class);
     long version;
     TxnKVClient client;
     KVClient readClient;
-    static class ValueEntry {
+    public static class ValueEntry {
         TransactionEvent.TransactionEventType event;
         ByteString value;
         public ValueEntry(TransactionEvent.TransactionEventType event, ByteString value) {
             this.event = event;
             this.value = value;
+        }
+
+        public ByteString getValue() {
+            return value;
         }
     }
 
@@ -48,7 +57,7 @@ public class KVTransaction extends AbstractTransactionCommands {
         this.session = session;
         this.client = session.createTxnClient();
         this.version = client.getTimestamp().getVersion();
-        System.out.println(Thread.currentThread().getName() + " start tm " + this.version);
+       logger.info(Thread.currentThread().getName() + " start tm " + this.version);
         this.readClient = session.createKVClient();
     }
     @Override
@@ -64,32 +73,39 @@ public class KVTransaction extends AbstractTransactionCommands {
         }
     }
 
+    public Committer getCommiter() {
+        return new KVTwoPhaseCommiter(session, buffer, version, 4000);
+    }
+
     public void commit() {
-        TwoPhaseCommitter twoPhaseCommitter = new TwoPhaseCommitter(session, version, 4000);
+//        TwoPhaseCommitter twoPhaseCommitter = new TwoPhaseCommitter(session, version, 4000);
+//
+//        BackOffer backOffer = ConcreteBackOffer.newCustomBackOff(config.getBackOfferMs());
+//        byte[] primaryKey = null;
+//        ByteString key = null;
+//        Iterator<ByteString> iterator = this.buffer.keySet().iterator();
+//        if (iterator.hasNext()) {
+//            key = iterator.next();
+//            primaryKey = key.toByteArray();
+//            twoPhaseCommitter.prewritePrimaryKey(backOffer, primaryKey, this.buffer.get(key).value.toByteArray());
+//        }
+//        List<BytePairWrapper> pairs = new LinkedList<>();
+//        List<ByteWrapper> keys = new LinkedList<>();
+//        while (iterator.hasNext()) {
+//            key = iterator.next();
+//            byte[] byteKey = key.toByteArray();
+//            pairs.add(new BytePairWrapper(byteKey, this.buffer.get(key).value.toByteArray()));
+//            keys.add(new ByteWrapper(byteKey));
+//        }
+//        twoPhaseCommitter.prewriteSecondaryKeys(primaryKey, pairs.iterator(), config.getBackOfferMs());
+//        long commitVersion = session.getTimestamp().getVersion();
+//        logger.info(Thread.currentThread().getName() + " commit tm " + commitVersion);
+//        twoPhaseCommitter.commitPrimaryKey(backOffer, primaryKey, commitVersion);
+//        twoPhaseCommitter.commitSecondaryKeys(keys.iterator(), commitVersion, config.getBackOfferMs());
 
-        BackOffer backOffer = ConcreteBackOffer.newCustomBackOff(config.getBackOfferMs());
-        byte[] primaryKey = null;
-        ByteString key = null;
-        Iterator<ByteString> iterator = this.buffer.keySet().iterator();
-        if (iterator.hasNext()) {
-            key = iterator.next();
-            primaryKey = key.toByteArray();
-            twoPhaseCommitter.prewritePrimaryKey(backOffer, primaryKey, this.buffer.get(key).value.toByteArray());
-        }
-        List<BytePairWrapper> pairs = new LinkedList<>();
-        List<ByteWrapper> keys = new LinkedList<>();
-        while (iterator.hasNext()) {
-            key = iterator.next();
-            byte[] byteKey = key.toByteArray();
-            pairs.add(new BytePairWrapper(byteKey, this.buffer.get(key).value.toByteArray()));
-            keys.add(new ByteWrapper(byteKey));
-        }
-        twoPhaseCommitter.prewriteSecondaryKeys(primaryKey, pairs.iterator(), config.getBackOfferMs());
-        long commitVersion = session.getTimestamp().getVersion();
-        System.out.println(Thread.currentThread().getName() + " commit tm " + commitVersion);
-        twoPhaseCommitter.commitPrimaryKey(backOffer, primaryKey, commitVersion);
-        twoPhaseCommitter.commitSecondaryKeys(keys.iterator(), commitVersion, config.getBackOfferMs());
-
+        Committer committer = getCommiter();
+        committer.prewrite(config.getBackOfferMs());
+        committer.commit(config.getBackOfferMs());
     }
 
 
