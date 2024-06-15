@@ -91,4 +91,16 @@ public abstract class AbstractDynamicConfig implements DynamicConfig {
     }
   }
 
+  @Override
+  public <T extends DynamicConfigClass> T getDynmicClass(String key, Class<T> glass) {
+    T value = this.get(key, glass);
+    this.addListen(key, glass, (old, now) -> {
+      try {
+        value.change(now);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    });
+    return value;
+  }
 }

@@ -19,7 +19,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.example</groupId>
+      <groupId>latte.lib</groupId>
       <artifactId>api</artifactId>
       <version>1.0-SNAPSHOT</version>
       <scope>compile</scope>
