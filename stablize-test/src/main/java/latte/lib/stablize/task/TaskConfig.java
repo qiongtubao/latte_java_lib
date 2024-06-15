@@ -1,10 +1,9 @@
 package latte.lib.stablize.task;
 
-import latte.lib.common.utils.JsonUtils;
+import latte.lib.common.serialization.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Setter

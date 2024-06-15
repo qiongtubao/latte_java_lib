@@ -7,6 +7,9 @@ import java.util.Properties;
 public class Main {
     public static void main(String[] args) throws Exception {
         KVClient kvClient = new KVClient();
-        
+        kvClient.initial();
+        kvClient.put("key", "v0");
+        System.out.println(kvClient.get("key"));
+
     }
 }

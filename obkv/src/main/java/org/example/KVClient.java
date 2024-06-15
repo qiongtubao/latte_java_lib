@@ -26,11 +26,17 @@ public class KVClient {
     public boolean initial() {
         try {
             obTableClient = new ObTableClient();
-            obTableClient.setFullUserName("admin"); // e.g. root@sys#ocp
-            obTableClient.setClusterName("obtest");
+//            obTableClient.setFullUserName("root@sys#obcluster"); // e.g. root@sys#ocp
+            obTableClient.setClusterName("obcluster");
+            obTableClient.setDatabase("test");
+            obTableClient.setPassword("");
+//            obTableClient.setDatabase("oceanbase");
+            obTableClient.setParamURL("http://172.23.117.26:8080/services?Action=ObRootServiceInfo&ObCluster=obcluster&version=2&ObClusterId=1&database=test");
 //            obTableClient.setParamURL("your configurl + database=xxx"); // e.g. http://ip:port/services?Action=ObRootServiceInfo&ObRegion=ocp&database=test
-            obTableClient.setPassword("a");
-//            obTableClient.setSysUserName("your sys user"); // e.g. proxyro@sys
+//            obTableClient.setPassword("a");
+            obTableClient.setTenantName("sys");
+            obTableClient.setUserName("root");
+            obTableClient.setSysUserName("root@sys"); // e.g. proxyro@sys
 //            obTableClient.setSysPassword("your sys user passwd");
             obTableClient.init();
         } catch (Exception e) {

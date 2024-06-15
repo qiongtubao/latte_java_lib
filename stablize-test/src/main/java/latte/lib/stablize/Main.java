@@ -1,6 +1,6 @@
 package latte.lib.stablize;
 
-import latte.lib.common.utils.JsonUtils;
+import latte.lib.common.serialization.JsonUtils;
 import latte.lib.stablize.task.TaskConfig;
 import latte.lib.stablize.task.TaskManager;
 import lombok.Getter;

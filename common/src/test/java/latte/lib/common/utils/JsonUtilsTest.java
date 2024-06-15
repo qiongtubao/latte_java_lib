@@ -1,6 +1,6 @@
 package latte.lib.common.utils;
 
-import latte.lib.common.utils.JsonUtils;
+import latte.lib.common.serialization.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.Assert;
