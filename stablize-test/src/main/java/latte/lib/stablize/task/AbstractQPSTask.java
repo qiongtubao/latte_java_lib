@@ -1,13 +1,17 @@
 package latte.lib.stablize.task;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 public class AbstractQPSTask extends AbstractTask {
     int maxQps;
     long interval;
     long lastRequestTime;
     int tokens;
 
-    public AbstractQPSTask(int maxQps) {
-        this.maxQps = maxQps;
+    public AbstractQPSTask(TaskConfig config,  ScheduledThreadPoolExecutor scheduledExecutorService, ExecutorService executorService) {
+        super(config, scheduledExecutorService, executorService);
+        this.maxQps = config.getIntArg("maxQps");
         this.interval = 1000/maxQps;
         this.lastRequestTime = System.currentTimeMillis();
         this.tokens = maxQps;

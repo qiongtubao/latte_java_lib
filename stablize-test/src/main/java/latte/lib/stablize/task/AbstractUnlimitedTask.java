@@ -2,6 +2,7 @@ package latte.lib.stablize.task;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public abstract class AbstractUnlimitedTask extends AbstractTask {
     protected ScheduledExecutorService scheduledExecutorService;
@@ -9,10 +10,9 @@ public abstract class AbstractUnlimitedTask extends AbstractTask {
     protected ExecutorService executorService;
 
     int threadnum;
-    public AbstractUnlimitedTask(int threadnum, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) {
-        this.threadnum = threadnum;
-        this.scheduledExecutorService = scheduledExecutorService;
-        this.executorService = executorService;
+    public AbstractUnlimitedTask(TaskConfig config, ScheduledThreadPoolExecutor scheduledExecutorService, ExecutorService executorService) {
+        super(config, scheduledExecutorService, executorService);
+        this.threadnum = config.getIntArg("threadnum");
     }
 
     public abstract void doTest();

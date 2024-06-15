@@ -1,6 +1,8 @@
 package latte.lib.stablize.task;
 
+
 public interface Task {
+
     void initialize();
 
     void start();
@@ -10,4 +12,7 @@ public interface Task {
     String name();
 
     boolean isStopped();
+
+    TaskConfig getConfig();
+
 }

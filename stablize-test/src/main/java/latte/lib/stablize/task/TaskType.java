@@ -1,58 +1,28 @@
 package latte.lib.stablize.task;
 
-import latte.lib.stablize.task.impl.redis.CreateTombstoneTask;
-import latte.lib.stablize.task.impl.redis.MonitorGcTask;
-import latte.lib.stablize.task.impl.tikv.OneKeyConflictTask;
-
+import java.lang.reflect.Constructor;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-public enum TaskType {
-    OneKeyConflict("tikvOneKeyConflict") {
-        @Override
-        Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception {
-            return new OneKeyConflictTask(
-                    taskConfig.getConfig("threads", Integer.class),
-                    taskConfig.getConfig("host", String.class),
-                    taskConfig.getConfig("port", int.class),
-                    taskConfig.getConfig("conflictCount", Integer.class),
-                    scheduledExecutorService, executorService);
-        }
-    },
-    MonitorGc("monitorGc") {
-        @Override
-        Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception {
-            return new MonitorGcTask(taskConfig.getConfig("host", String.class),
-                    taskConfig.getConfig("port", int.class),
-                    scheduledExecutorService, executorService);
-        }
-    },
-    CreateTombstone("createTombstone") {
-        @Override
-        Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception {
-            return new CreateTombstoneTask(
-                    taskConfig.getConfig("host", String.class),
-                    taskConfig.getConfig("port", int.class),
-                    taskConfig.getConfig("threads", Integer.class),
-                    scheduledExecutorService, executorService);
-        }
-    };
-    private String type;
-    TaskType(String type) {this.type = type;}
+public class TaskType {
+    static Map<String, Class<Task>> registers = new LinkedHashMap<>();
 
-    public String getType() {
-        return type;
+    static void regionTask(String name, Class<Task> glass) {
+        registers.put(name, glass);
     }
 
-    public static TaskType form(String type) {
-
-        for (TaskType taskType : values()) {
-            if (taskType.getType().equalsIgnoreCase(type)) {
-                return taskType;
-            }
-        }
-
-        throw new IllegalArgumentException("task type: " + type + " not exists!");
+    public static Task createTask(String name, TaskContext context, ScheduledThreadPoolExecutor scheduled, ExecutorService executors) throws Exception {
+        Class<?>[] glassTypes = new Class[3];
+        Object[] glassParams = new Object[3];
+        glassTypes[0] = TaskContext.class;
+        glassTypes[1] = ScheduledThreadPoolExecutor.class;
+        glassTypes[2] = ExecutorService.class;
+        glassParams[0] = context;
+        glassParams[1] = scheduled;
+        glassParams[2] = executors;
+        Constructor<? extends Task> constructor = registers.get(name).getConstructor(glassTypes);
+        return constructor.newInstance(glassParams);
     }
-    abstract Task createTask(TaskConfig taskConfig, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) throws Exception;
 }
