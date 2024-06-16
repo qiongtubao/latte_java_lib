@@ -8,7 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="influxdb_launcher" />
-        <module name="stablize-test" />
+        <module name="stabilize-test" />
         <module name="mongodb_launcher" />
         <module name="redis_launcher" />
         <module name="obkv" />

@@ -25,12 +25,12 @@
             </DefaultRolloverStrategy>
         </RollingFile>
 
-        <TripLog4j2Appender name="clogAppender4Log4j2"/>
+<!--        <TripLog4j2Appender name="clogAppender4Log4j2"/>-->
     </Appenders>
     <Loggers>
         <Logger name="com" level="INFO">
             <AppenderRef ref="RollingFileInfo"/>
-            <appender-ref ref="clogAppender4Log4j2"/>
+<!--            <appender-ref ref="clogAppender4Log4j2"/>-->
         </Logger>
         <Root level="WARN">
             <AppenderRef ref="Async"/>

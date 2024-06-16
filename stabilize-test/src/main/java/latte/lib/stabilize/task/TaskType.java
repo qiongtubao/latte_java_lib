@@ -1,4 +1,4 @@
-package latte.lib.stablize.task;
+package latte.lib.stabilize.task;
 
 import java.lang.reflect.Constructor;
 import java.util.LinkedHashMap;
@@ -13,13 +13,13 @@ public class TaskType {
         registers.put(name, glass);
     }
 
-    public static Task createTask(String name, TaskContext context, ScheduledThreadPoolExecutor scheduled, ExecutorService executors) throws Exception {
+    public static Task createTask(String name, TaskConfig config, ScheduledThreadPoolExecutor scheduled, ExecutorService executors) throws Exception {
         Class<?>[] glassTypes = new Class[3];
         Object[] glassParams = new Object[3];
-        glassTypes[0] = TaskContext.class;
+        glassTypes[0] = TaskConfig.class;
         glassTypes[1] = ScheduledThreadPoolExecutor.class;
         glassTypes[2] = ExecutorService.class;
-        glassParams[0] = context;
+        glassParams[0] = config;
         glassParams[1] = scheduled;
         glassParams[2] = executors;
         Constructor<? extends Task> constructor = registers.get(name).getConstructor(glassTypes);

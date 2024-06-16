@@ -42,11 +42,11 @@ public class HttpDynamicConfig extends AbstractIntervalDynamicConfig {
 
 
   @Override
-  Map<String, String> loadCached() throws Exception {
+  Map<String, Object> loadCached() throws Exception {
     return requester.requestMap(new HttpRequestInfo<>(
         this.httpUrl,
         HttpMethod.GET,
         null
-    ), String.class, String.class);
+    ), String.class, Object.class);
   }
 }

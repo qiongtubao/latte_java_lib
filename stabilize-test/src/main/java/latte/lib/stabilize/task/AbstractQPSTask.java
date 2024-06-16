@@ -1,4 +1,4 @@
-package latte.lib.stablize.task;
+package latte.lib.stabilize.task;
 
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -17,7 +17,7 @@ public abstract class AbstractQPSTask extends AbstractTask {
     public AbstractQPSTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled,
         ExecutorService executors) {
         super(config, scheduled, executors);
-        this.clusterName = config.getArg("cluster");
+//        this.clusterName = config.getArg("cluster");
         this.thread = config.getIntArg("thread");
         this.qps = config.getDoubleArg("qps");
         this.scheduledExecutorService = scheduled;
@@ -109,7 +109,7 @@ public abstract class AbstractQPSTask extends AbstractTask {
 
     private Future<?> future;
 
-    protected String clusterName;
+//    protected String clusterName;
 
 //    protected TransactionalKVClient kvClient;
 
@@ -133,9 +133,9 @@ public abstract class AbstractQPSTask extends AbstractTask {
         return executorService;
     }
 
-    public String getClusterName() {
-        return clusterName;
-    }
+//    public String getClusterName() {
+//        return clusterName;
+//    }
 
     public abstract Runnable doTest();
 

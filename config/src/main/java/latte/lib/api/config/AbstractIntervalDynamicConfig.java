@@ -21,7 +21,7 @@ public abstract class AbstractIntervalDynamicConfig extends AbstractDynamicConfi
       }, this.interval, TimeUnit.SECONDS);
     }
 
-  abstract Map<String,String> loadCached() throws Exception;
+  abstract Map<String,Object> loadCached() throws Exception;
   boolean updateCached() {
     if (this.status == Status.BUSY) {
       return true;

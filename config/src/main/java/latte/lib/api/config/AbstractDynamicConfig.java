@@ -10,25 +10,25 @@ import latte.lib.common.serialization.JsonUtils;
 
 
 public abstract class AbstractDynamicConfig implements DynamicConfig {
-  Map<String, String> cached;
+  Map<String, Object> cached;
 
   Map<String, Map<Class, List<BiConsumer>>> listens = new LinkedHashMap<>();
-  void setCached(Map<String,String> cached) throws Exception {
-    Map<String, String> oldCached = this.cached;
+  void setCached(Map<String, Object> cached) throws Exception {
+    Map<String, Object> oldCached = this.cached;
     this.cached = cached;
-    for(Entry<String,String> kv : oldCached.entrySet()) {
+    for(Entry<String,Object> kv : oldCached.entrySet()) {
       String key = kv.getKey();
-      String value = kv.getValue();
-      String nowVal = cached.get(key);
+      String value = JsonUtils.encode(kv.getValue());
+      String nowVal = JsonUtils.encode(cached.get(key));
       if (!value.equals(nowVal)) {
         notify(key, value, nowVal);
       }
     }
-    for(Entry<String,String> kv : cached.entrySet()) {
+    for(Entry<String,Object> kv : cached.entrySet()) {
       String key = kv.getKey();
-      String oldVal = oldCached.get(key);
+      Object oldVal = oldCached.get(key);
       if (oldVal == null) {
-        String value = kv.getValue();
+        String value = JsonUtils.encode(kv.getValue());
         notify(key, null, value);
       }
     }
@@ -65,23 +65,24 @@ public abstract class AbstractDynamicConfig implements DynamicConfig {
 
 
   @Override
-  public String getString(String key) {
-    return get(key, null);
+  public String getString(String key) throws Exception {
+    return getString(key, null);
   }
 
   @Override
-  public String getString(String key, String defaultVal) {
-    return this.cached.getOrDefault(key, defaultVal);
+  public String getString(String key, String defaultVal) throws Exception {
+    return JsonUtils.encode(this.cached.getOrDefault(key, defaultVal)) ;
   }
 
   @Override
-  public <T> T get(String key, Class<T> glass) {
+  public <T> T get(String key, Class<T> glass) throws Exception {
     return get(key, glass,null);
   }
 
   @Override
-  public <T> T get(String key, Class<T> glass, T val) {
-    String value = this.cached.get(key);
+  public <T> T get(String key, Class<T> glass, T val) throws Exception {
+    if (this.cached == null) return val;
+    String value = getString(key);
     if (value == null) return val;
     try {
       T result = JsonUtils.decode(value, glass);
@@ -92,7 +93,8 @@ public abstract class AbstractDynamicConfig implements DynamicConfig {
   }
 
   @Override
-  public <T extends DynamicConfigClass> T getDynmicClass(String key, Class<T> glass) {
+  public <T extends DynamicConfigClass> T getDynmicClass(String key, Class<T> glass)
+      throws Exception {
     T value = this.get(key, glass);
     this.addListen(key, glass, (old, now) -> {
       try {

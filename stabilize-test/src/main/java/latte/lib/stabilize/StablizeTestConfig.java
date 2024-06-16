@@ -1,10 +1,10 @@
-package latte.lib.stablize;
+package latte.lib.stabilize;
 
 import java.util.Map;
 import latte.lib.api.config.AbstractDynamicConfigClass;
 import latte.lib.api.config.DynamicConfig;
 import latte.lib.common.serialization.JsonUtils;
-import latte.lib.stablize.task.TaskConfig;
+import latte.lib.stabilize.task.TaskConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +14,6 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
   Map<String, Map<String, TaskConfig>> tasks;
   int executorNum = 100;
   int scheduledNum = 100;
-  DynamicConfig dynamicConfig;
 
 
   public StablizeTestConfig() {

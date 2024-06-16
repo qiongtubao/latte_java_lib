@@ -13,6 +13,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
@@ -105,9 +107,11 @@ public class HttpRequester implements Requester {
     return response.getBody();
   }
 
+  static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
   @Override
   public <K, V> Map<K, V> requestMap(Object requestInfo, Class<K> k, Class<V> v) throws Exception {
     HttpRequestInfo info = (HttpRequestInfo) requestInfo;
+    logger.info("[latte]request map {} {} {}", info.getPath(), info.getMethod());
     ResponseEntity<Map<K,V>> response = restOperations.exchange(
         info.getPath(),
         info.getMethod(),
@@ -115,6 +119,8 @@ public class HttpRequester implements Requester {
         new ParameterizedTypeReference<Map<K,V>>() {
         }
     );
-    return response.getBody();
+    Map<K,V> result = response.getBody();
+    logger.info("[latte]request map {}", result, response.getStatusCode());
+    return result;
   }
 }

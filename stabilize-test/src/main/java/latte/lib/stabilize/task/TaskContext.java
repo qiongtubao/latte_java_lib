@@ -1,4 +1,4 @@
-package latte.lib.stablize.task;
+package latte.lib.stabilize.task;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package latte.lib.stablize.task;
+package latte.lib.stabilize.task;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
-import latte.lib.stablize.StablizeTestConfig;
+import latte.lib.stabilize.StablizeTestConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,17 +24,17 @@ public class TaskManager {
         config.getTasks().forEach((clusterName, confs) -> {
             Map<String, Task> ts = new LinkedHashMap<>();
             confs.forEach((taskName, conf) -> {
-                ts.put(conf.getTaskName(), createTask(clusterName, conf));
+                ts.put(taskName, createTask(clusterName, taskName, conf));
             });
             this.tasks.put(clusterName, ts);
         });
     }
 
-    public Task createTask(String clusterName, TaskConfig conf) {
-        TaskContext taskContext = new TaskContext(clusterName, conf.getTaskName(), scheduled, executors, conf.getArgs());
+    public Task createTask(String clusterName,String taskName, TaskConfig conf) {
+//        TaskContext taskContext = new TaskContext(clusterName, taskName, scheduled, executors, conf.getArgs());
         Task task = null;
         try {
-            task = TaskType.createTask(conf.getTaskName(), taskContext, scheduled, executors);
+            task = TaskType.createTask(taskName, conf, scheduled, executors);
             task.initialize();
             task.start();
         } catch (Exception e) {
@@ -75,7 +75,7 @@ public class TaskManager {
             if (tasks == null) {
                 Map<String, Task> ts = new LinkedHashMap<>();
                 configs.forEach((taskName, conf) -> {
-                    ts.put(taskName, createTask(clusterName, conf));
+                    ts.put(taskName, createTask(clusterName, taskName, conf));
                 });
                 this.tasks.put(clusterName, ts);
                 continue;
@@ -97,7 +97,7 @@ public class TaskManager {
                         task.stop();
                     }
                 }
-                tasks.put(taskName, createTask(clusterName, kt.getValue()));
+                tasks.put(taskName, createTask(clusterName, taskName, kt.getValue()));
             }
             for(Entry<String, Task> kt: tasks.entrySet()) {
                 String taskName = kt.getKey();

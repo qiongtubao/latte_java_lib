@@ -1,14 +1,13 @@
-package latte.lib.stablize.task;
+package latte.lib.stabilize.task;
 
 import java.util.Map;
-import latte.lib.common.serialization.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 public class TaskConfig {
-  String taskName;
+
   Map<String, String> args;
 
   public TaskConfig() {
