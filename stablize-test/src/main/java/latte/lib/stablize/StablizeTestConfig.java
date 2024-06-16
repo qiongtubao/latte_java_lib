@@ -29,7 +29,7 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
     this.notify("this", now, this);
   }
 
-  void exchange(StablizeTestConfig now) {
+  public void exchange(StablizeTestConfig now) {
     int oldExecutorNum = this.executorNum;
     this.executorNum = now.executorNum;
     now.executorNum = oldExecutorNum;
@@ -48,7 +48,7 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
   //2. update tasks
   //3. all
   //4. clean
-  int needUpdate(StablizeTestConfig config) {
+  public int needUpdate(StablizeTestConfig config) {
     if (config == null) {
       return 4;
     }

@@ -16,7 +16,14 @@ public class TaskConfig {
   }
 
   public int getIntArg(String key) {
-    String value = this.args.get(key);
-    return Integer.valueOf(value);
+    return Integer.valueOf(this.getArg(key));
+  }
+
+  public String getArg(String key) {
+    return this.args.get(key);
+  }
+
+  public double getDoubleArg(String key) {
+    return Double.valueOf(this.getArg(key));
   }
 }

@@ -7,9 +7,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class TaskType {
-    static Map<String, Class<Task>> registers = new LinkedHashMap<>();
+    static Map<String, Class<? extends Task>> registers = new LinkedHashMap<>();
 
-    static void regionTask(String name, Class<Task> glass) {
+    static void regionTask(String name, Class<? extends Task> glass) {
         registers.put(name, glass);
     }
 
