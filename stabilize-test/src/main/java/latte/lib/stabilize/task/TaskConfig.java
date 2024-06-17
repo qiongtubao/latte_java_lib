@@ -8,21 +8,29 @@ import lombok.Setter;
 @Getter
 public class TaskConfig {
 
-  Map<String, String> args;
+  Map<String, Object> args;
 
   public TaskConfig() {
 
   }
 
   public int getIntArg(String key) {
-    return Integer.valueOf(this.getArg(key));
+    return (int)this.getArg(key);
   }
 
-  public String getArg(String key) {
-    return this.args.get(key);
+  public String getArgStr(String key) {
+    return (String) getArg(key);
   }
 
   public double getDoubleArg(String key) {
-    return Double.valueOf(this.getArg(key));
+    Object d = this.getArg(key);
+    if (d instanceof Double) {
+      return (double)d;
+    }
+    return Double.valueOf(String.valueOf(d));
+  }
+
+  public Object getArg(String key) {
+    return this.args.get(key);
   }
 }

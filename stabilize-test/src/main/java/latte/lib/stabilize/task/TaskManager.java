@@ -10,6 +10,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import latte.lib.stabilize.StablizeTestConfig;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Setter
 @Getter
@@ -18,28 +20,33 @@ public class TaskManager {
 
     ScheduledThreadPoolExecutor scheduled;
     ExecutorService executors;
+
+    Logger logger = LoggerFactory.getLogger(TaskManager.class);
     public TaskManager(StablizeTestConfig config) {
         scheduled = new ScheduledThreadPoolExecutor(config.getScheduledNum());
         executors =  Executors.newFixedThreadPool(config.getExecutorNum());
         config.getTasks().forEach((clusterName, confs) -> {
             Map<String, Task> ts = new LinkedHashMap<>();
             confs.forEach((taskName, conf) -> {
-                ts.put(taskName, createTask(clusterName, taskName, conf));
+                Task task = null;
+                try {
+                    task = createTask(clusterName, taskName, conf);
+                    ts.put(taskName, task);
+                } catch (Exception e) {
+                    //一个任务错误不影响其他任务
+                    logger.error("create task fail , clusterName: {} taskName: {}, conf: {}, error: {}"
+                        , clusterName, taskName, conf, e);
+                }
             });
             this.tasks.put(clusterName, ts);
         });
     }
 
-    public Task createTask(String clusterName,String taskName, TaskConfig conf) {
-//        TaskContext taskContext = new TaskContext(clusterName, taskName, scheduled, executors, conf.getArgs());
+    public Task createTask(String clusterName,String taskName, TaskConfig conf) throws Exception {
         Task task = null;
-        try {
-            task = TaskType.createTask(taskName, conf, scheduled, executors);
-            task.initialize();
-            task.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        task = TaskType.createTask(taskName, conf, scheduled, executors);
+        task.initialize();
+        task.start();
         return task;
     }
 
@@ -75,7 +82,15 @@ public class TaskManager {
             if (tasks == null) {
                 Map<String, Task> ts = new LinkedHashMap<>();
                 configs.forEach((taskName, conf) -> {
-                    ts.put(taskName, createTask(clusterName, taskName, conf));
+                    Task task = null;
+                    try {
+                        task = createTask(clusterName, taskName, conf);
+                        ts.put(taskName, task);
+                    } catch (Exception e) {
+                        logger.error("[updateTasks] add task fail, clusterName: {}, taskName: {}, conf: {}, e: {}",
+                            clusterName, taskName, conf, e);
+                    }
+
                 });
                 this.tasks.put(clusterName, ts);
                 continue;
@@ -96,8 +111,15 @@ public class TaskManager {
                     } else {
                         task.stop();
                     }
+                    tasks.remove(taskName);
                 }
-                tasks.put(taskName, createTask(clusterName, taskName, kt.getValue()));
+                try {
+                    task = createTask(clusterName, taskName, kt.getValue());
+                    tasks.put(taskName, task);
+                } catch (Exception e) {
+                    logger.error("[updateTasks] updateOrAdd Task fail , clusterName:{} taskName: {} config: {} error: {}",
+                        clusterName, taskName, config, e);
+                }
             }
             for(Entry<String, Task> kt: tasks.entrySet()) {
                 String taskName = kt.getKey();

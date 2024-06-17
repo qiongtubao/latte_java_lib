@@ -109,17 +109,11 @@ public abstract class AbstractQPSTask extends AbstractTask {
 
     private Future<?> future;
 
-//    protected String clusterName;
-
-//    protected TransactionalKVClient kvClient;
 
     protected int thread;
 
-    //  private QpsController qpsController;
+
     BlockingQueue<Runnable> queue;
-//    public AbstractQpsTask2(String clusterName, int thread, int qps, ScheduledExecutorService scheduledExecutorService, ExecutorService executorService) {
-//
-//    }
 
     public double getQps() {
         return qps;
@@ -133,9 +127,6 @@ public abstract class AbstractQPSTask extends AbstractTask {
         return executorService;
     }
 
-//    public String getClusterName() {
-//        return clusterName;
-//    }
 
     public abstract Runnable doTest();
 
@@ -188,26 +179,8 @@ public abstract class AbstractQPSTask extends AbstractTask {
     }
 
     @Override
-    public void doInitialize() {
+    public void doInitialize() throws Exception {
         super.doInitialize();
-//        kvClient = null;
-//        while(kvClient == null) {
-//            Transaction t = Cat.newTransaction("tikv-statlize-test", "getTxnClient");
-//            try {
-//                kvClient = KVClientFactory.getTxnClient(clusterName);
-//                break;
-//            } catch (Exception e) {
-//                logger.error("getTxnClient",e);
-//                Cat.logError(e);
-//            } finally {
-//                t.complete();
-//            }
-//            try {
-//                Thread.sleep(1000);
-//            }catch (Exception e) {
-//
-//            }
-//        }
         logger.info("{} initialize ok!", this.getClass().getSimpleName());
     }
 

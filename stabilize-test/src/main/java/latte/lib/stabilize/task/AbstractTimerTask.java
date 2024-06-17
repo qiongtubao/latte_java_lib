@@ -46,7 +46,7 @@ public abstract class AbstractTimerTask extends AbstractTask{
     }
 
     @Override
-    public void doInitialize() {
+    public void doInitialize() throws Exception {
         super.doInitialize();
 
     }

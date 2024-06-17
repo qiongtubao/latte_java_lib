@@ -40,7 +40,7 @@ public class AbstractTask implements Task {
 
 
     @Override
-    public void initialize() {
+    public void initialize() throws Exception {
 
         if (initialized.compareAndSet(false, true)) {
             doInitialize();
@@ -96,7 +96,7 @@ public class AbstractTask implements Task {
 
     }
 
-    protected void doInitialize() {
+    protected void doInitialize() throws Exception {
 
     }
 }
