@@ -34,7 +34,7 @@ public class TaskManager {
                     ts.put(taskName, task);
                 } catch (Exception e) {
                     //一个任务错误不影响其他任务
-                    logger.error("create task fail , clusterName: {} taskName: {}, conf: {}, error: {}"
+                    logger.error("create task fail , clusterName: {} taskName: {}, conf: {}, error: "
                         , clusterName, taskName, conf, e);
                 }
             });
