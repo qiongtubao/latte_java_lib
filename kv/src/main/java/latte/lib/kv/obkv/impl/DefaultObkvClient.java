@@ -9,13 +9,18 @@ import com.alipay.oceanbase.rpc.mutation.Delete;
 import com.alipay.oceanbase.rpc.mutation.InsertOrUpdate;
 import com.alipay.oceanbase.rpc.mutation.result.BatchOperationResult;
 import com.alipay.oceanbase.rpc.mutation.result.MutationResult;
+import com.alipay.oceanbase.rpc.stream.QueryResultSet;
 import com.alipay.oceanbase.rpc.table.api.TableBatchOps;
+import com.alipay.oceanbase.rpc.table.api.TableQuery;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import latte.lib.api.kv.KVClient;
+import latte.lib.api.kv.scan.AbstractScanIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /* 测试表schema:
@@ -129,5 +134,40 @@ public class DefaultObkvClient implements KVClient {
       return false;
     }
     return true;
+  }
+
+  static class ObkvScanIterator extends AbstractScanIterator {
+    ObTableClient client;
+    String tableName;
+    int offline = 0;
+    public ObkvScanIterator(ObTableClient client, String tableName,
+        String startKey, String endKey, int limit) {
+      super(startKey, endKey, limit);
+      this.client = client;
+      this.tableName = tableName;
+    }
+
+    @Override
+    protected int queryData() {
+      TableQuery query = client.query(tableName);
+      query.limit(offline, limit);
+      int len = 0;
+      try {
+        QueryResultSet result = query.execute();
+        System.out.println(result);
+        while(result.next()) {
+          data.add((String)result.getRow().get("key"));
+          len++;
+        }
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      offline += len;
+      return len;
+    }
+  }
+  @Override
+  public Iterator<String> scanKey(String startKey, String endKey, int limit) {
+    return new ObkvScanIterator(client, tableName, startKey, endKey, limit);
   }
 }

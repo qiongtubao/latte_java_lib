@@ -1,14 +1,21 @@
 package latte.lib.kv.tikv.impl;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import latte.lib.api.kv.KVClient;
+import latte.lib.api.kv.scan.AbstractScanIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tikv.common.operation.iterator.ConcreteScanIterator;
+import org.tikv.common.util.BackOffer;
+import org.tikv.common.util.ConcreteBackOffer;
+import org.tikv.kvproto.ImportKvpb.KVPair;
+import org.tikv.kvproto.Kvrpcpb.KvPair;
 import org.tikv.raw.RawKVClient;
 import org.tikv.shade.com.google.protobuf.ByteString;
 
@@ -56,5 +63,38 @@ public class DefaultRawTikvClient implements KVClient {
       return false;
     }
     return true;
+  }
+
+  static class RawTikvScanIterator extends AbstractScanIterator {
+
+    String indexKey;
+
+    RawKVClient client;
+    public RawTikvScanIterator(RawKVClient kvClient, String startKey, String endKey, int limit) {
+      super(startKey, endKey, limit);
+      this.client = kvClient;
+      indexKey = startKey;
+    }
+
+    @Override
+    protected int queryData() {
+      List<KvPair> result = this.client.scan(
+          ByteString.copyFromUtf8(indexKey),
+          ByteString.copyFromUtf8(endKey),
+      limit);
+      int len = 0;
+      for(KvPair kv : result) {
+        String key = (kv.getKey().toStringUtf8());
+        data.add(key);
+        len++;
+      }
+      indexKey = (String)data.get(len-1);
+      return len;
+    }
+  }
+
+  @Override
+  public Iterator<String> scanKey(String key, String end, int limit) {
+    return new RawTikvScanIterator(client, key, end, limit);
   }
 }
