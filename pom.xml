@@ -14,9 +14,8 @@
         <module>redis</module>
         <module>stabilize-test</module>
         <module>common</module>
-        <module>sql_launcher</module>
         <module>obkv</module>
-      <module>api</module>
+        <module>api</module>
         <module>config</module>
         <module>kv</module>
     </modules>

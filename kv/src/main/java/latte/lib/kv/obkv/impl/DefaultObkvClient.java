@@ -5,6 +5,7 @@ import static com.alipay.oceanbase.rpc.mutation.MutationFactory.row;
 
 import com.alipay.oceanbase.rpc.ObTableClient;
 import com.alipay.oceanbase.rpc.mutation.BatchOperation;
+import com.alipay.oceanbase.rpc.mutation.Delete;
 import com.alipay.oceanbase.rpc.mutation.InsertOrUpdate;
 import com.alipay.oceanbase.rpc.mutation.result.BatchOperationResult;
 import com.alipay.oceanbase.rpc.mutation.result.MutationResult;
@@ -115,8 +116,12 @@ public class DefaultObkvClient implements KVClient {
   @Override
   public boolean del(String key) {
     try {
-      long result = this.client.delete(tableName, key);
-      if (result == 0) {
+      BatchOperation batchOperation = this.client.batchOperation(tableName);
+      Delete deleteOperation = new Delete();
+      deleteOperation.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
+      batchOperation.addOperation(deleteOperation);
+      BatchOperationResult result = batchOperation.execute();
+      if (result.size() == 0) {
         return false;
       }
     } catch (Exception e) {
