@@ -1,9 +1,12 @@
 package latte.lib.kv.obkv.impl;
 
+import static com.alipay.oceanbase.rpc.filter.ObTableFilterFactory.compareVal;
 import static com.alipay.oceanbase.rpc.mutation.MutationFactory.colVal;
 import static com.alipay.oceanbase.rpc.mutation.MutationFactory.row;
 
 import com.alipay.oceanbase.rpc.ObTableClient;
+import com.alipay.oceanbase.rpc.filter.ObCompareOp;
+import com.alipay.oceanbase.rpc.filter.ObTableValueFilter;
 import com.alipay.oceanbase.rpc.mutation.BatchOperation;
 import com.alipay.oceanbase.rpc.mutation.Delete;
 import com.alipay.oceanbase.rpc.mutation.InsertOrUpdate;
@@ -37,6 +40,7 @@ public class DefaultObkvClient implements KVClient {
   public DefaultObkvClient(ObTableClient client, String tableName) {
     this.client = client;
     this.tableName = tableName;
+    this.client.addRowKeyElement(tableName, new String[]{"key"});
   }
 
 
@@ -63,10 +67,16 @@ public class DefaultObkvClient implements KVClient {
   @Override
   public String get(String key) {
     try {
-      Map<String, Object> result = client.get(tableName, key, new String[]{valName});
-      return (String)result.get(valName);
+      TableQuery query = client.query(tableName);
+      query.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
+      query.select(valName);
+      QueryResultSet result = query.execute();
+      if (result.next()) {
+        return (String)result.getRow().get(valName);
+      }
+      return null;
     } catch (Exception e) {
-      logger.error("[tikv-get]fail to get kv data {}", e);
+      logger.error("[obkv-get]fail to get kv key: {}", key,e);
       return null;
     }
   }
@@ -75,21 +85,25 @@ public class DefaultObkvClient implements KVClient {
   @Override
   public List<String> mget(List<String> keys) {
     try {
-      TableBatchOps batchOps = client.batch(tableName);
+
+      BatchOperation batchOps = client.batchOperation(tableName);
       for(String key: keys) {
-        batchOps.get(key, new String[]{valName});
+        TableQuery query = client.query(tableName);
+        query.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
+        batchOps.addOperation(query);
       }
-      List<Object> retObj = batchOps.execute();
+      BatchOperationResult
+          retObj = batchOps.execute();
       if (retObj.size() != keys.size()) {
-        logger.error("[obkv-mget]fail to put kv data, rows != 1");
-        return null;
+        logger.error("[obkv-mget]fail to get kv data, rows != 1");
+        return new LinkedList<>();
       }
-      return retObj.stream().map(o -> {
-        return (String)((Map)o).get(valName);
+      return retObj.getResults().stream().map(o -> {
+        return (String)(((MutationResult) o).getOperationRow().getMap()).get(valName);
       }).collect(Collectors.toList());
     } catch (Exception e) {
-      logger.error("[obkv-mget]fail to put kv data:{}", e);
-      return null;
+      logger.error("[obkv-mget]fail to get kv data:", e);
+      return new LinkedList<>();
     }
   }
 
@@ -151,10 +165,10 @@ public class DefaultObkvClient implements KVClient {
     protected int queryData() {
       TableQuery query = client.query(tableName);
       query.limit(offline, limit);
+      query.addScanRange(startKey, endKey);
       int len = 0;
       try {
         QueryResultSet result = query.execute();
-        System.out.println(result);
         while(result.next()) {
           data.add((String)result.getRow().get("key"));
           len++;
