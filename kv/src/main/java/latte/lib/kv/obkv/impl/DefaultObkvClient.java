@@ -135,12 +135,19 @@ public class DefaultObkvClient implements KVClient {
   @Override
   public boolean del(String key) {
     try {
-      BatchOperation batchOperation = this.client.batchOperation(tableName);
-      Delete deleteOperation = new Delete();
-      deleteOperation.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
-      batchOperation.addOperation(deleteOperation);
-      BatchOperationResult result = batchOperation.execute();
-      if (result.size() == 0) {
+//      BatchOperation batchOperation = this.client.batchOperation(tableName);
+//      Delete deleteOperation = new Delete();
+//      deleteOperation.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
+//      batchOperation.addOperation(deleteOperation);
+//      BatchOperationResult result = batchOperation.execute();
+//      if (result.getResults().size() == 0) {
+//        return false;
+//      }
+      MutationResult result = this.client.delete(tableName)
+//          .setFilter(new ObTableValueFilter(ObCompareOp.EQ, "key", key.getBytes(StandardCharsets.UTF_8)))
+          .setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))))
+          .execute();
+      if(result.getAffectedRows() == 0) {
         return false;
       }
     } catch (Exception e) {

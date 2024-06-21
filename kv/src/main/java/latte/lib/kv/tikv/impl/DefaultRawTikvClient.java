@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import latte.lib.api.kv.KVClient;
 import latte.lib.api.kv.scan.AbstractScanIterator;
@@ -33,7 +34,11 @@ public class DefaultRawTikvClient implements KVClient {
 
   @Override
   public String get(String key) {
-    return client.get(ByteString.copyFromUtf8(key)).get().toStringUtf8();
+    Optional<ByteString> result = client.get(ByteString.copyFromUtf8(key));
+    if (!result.isPresent()) {
+      return null;
+    }
+    return result.get().toStringUtf8();
   }
 
   @Override
@@ -76,6 +81,19 @@ public class DefaultRawTikvClient implements KVClient {
       indexKey = startKey;
     }
 
+    public String nextString(String str) {
+      if (str == null || str.isEmpty()) {
+        return str;
+      }
+
+      char[] charArray = str.toCharArray();
+      char lastChar = charArray[charArray.length - 1];
+      char modifiedChar = (char) (lastChar + 1);
+
+      charArray[charArray.length - 1] = modifiedChar;
+      return new String(charArray);
+
+    }
     @Override
     protected int queryData() {
       List<KvPair> result = this.client.scan(
@@ -88,7 +106,9 @@ public class DefaultRawTikvClient implements KVClient {
         data.add(key);
         len++;
       }
-      indexKey = (String)data.get(len-1);
+      if (len == 0) return 0;
+      //可能会出现炸尸情况
+      indexKey = nextString((String)data.get(len-1));
       return len;
     }
   }

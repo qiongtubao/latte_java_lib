@@ -1,11 +1,16 @@
-package latte.lib.kv.obkv.impl;
+package latte.lib.kv.tikv.impl;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import latte.lib.kv.AbstractKVTest;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
-public class DefaultObkvClientTest extends AbstractKVTest implements  CreateObkvClientTest {
+
+
+public class DefaultTikvClientTest extends AbstractKVTest implements CreateTikvClientTest {
 
   @Before
   public void before() throws Exception {
