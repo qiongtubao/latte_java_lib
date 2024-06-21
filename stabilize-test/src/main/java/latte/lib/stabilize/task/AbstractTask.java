@@ -93,10 +93,10 @@ public class AbstractTask implements Task {
     }
 
     protected void doStop() {
-
+        logger.info("{} stop!", this.getClass().getSimpleName());
     }
 
     protected void doInitialize() throws Exception {
-
+        logger.info("{} initialize ok!", this.getClass().getSimpleName());
     }
 }

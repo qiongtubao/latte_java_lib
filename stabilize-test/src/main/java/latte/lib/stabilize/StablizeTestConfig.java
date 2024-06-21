@@ -53,8 +53,8 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
     }
     //取巧  all(3) = update executor or scheeduledNum(1) + update tasks(2)
     int result = 0;
-    if (config.executorNum == this.executorNum
-    || config.scheduledNum == this.scheduledNum) {
+    if (config.executorNum != this.executorNum
+    || config.scheduledNum != this.scheduledNum) {
         result += 1;
     }
     if (config.tasks.size() != this.tasks.size()) {
