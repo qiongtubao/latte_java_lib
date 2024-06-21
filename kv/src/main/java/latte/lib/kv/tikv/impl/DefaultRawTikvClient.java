@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import latte.lib.api.kv.KVClient;
 import latte.lib.api.kv.scan.AbstractScanIterator;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tikv.common.operation.iterator.ConcreteScanIterator;
@@ -20,6 +22,9 @@ import org.tikv.kvproto.Kvrpcpb.KvPair;
 import org.tikv.raw.RawKVClient;
 import org.tikv.shade.com.google.protobuf.ByteString;
 
+
+@Setter
+@Getter
 public class DefaultRawTikvClient implements KVClient {
 
   RawKVClient client;
@@ -27,13 +32,13 @@ public class DefaultRawTikvClient implements KVClient {
     this.client = client;
   }
   @Override
-  public boolean set(String key, String value) {
+  public boolean set(String key, String value) throws Exception {
      client.put(ByteString.copyFromUtf8(key), ByteString.copyFromUtf8(value));
      return true;
   }
 
   @Override
-  public String get(String key) {
+  public String get(String key) throws Exception{
     Optional<ByteString> result = client.get(ByteString.copyFromUtf8(key));
     if (!result.isPresent()) {
       return null;
@@ -42,14 +47,14 @@ public class DefaultRawTikvClient implements KVClient {
   }
 
   @Override
-  public List<String> mget(List<String> keys) {
+  public List<String> mget(List<String> keys) throws Exception {
     return client.batchGet(keys.stream().map(key -> ByteString.copyFromUtf8(key)).collect(Collectors.toList())).stream().map(kv -> {
       return kv.getValue().toStringUtf8();
     }).collect(Collectors.toList());
   }
 
   @Override
-  public boolean mset(Map<String, String> map) {
+  public boolean mset(Map<String, String> map) throws Exception {
     Map<ByteString, ByteString> bmap = new LinkedHashMap<ByteString, ByteString>();
     for(Entry<String, String> kv: map.entrySet()) {
       bmap.put(ByteString.copyFromUtf8(kv.getKey()), ByteString.copyFromUtf8(kv.getValue()));
@@ -61,12 +66,7 @@ public class DefaultRawTikvClient implements KVClient {
   Logger logger = LoggerFactory.getLogger(DefaultRawTikvClient.class);
   @Override
   public boolean del(String key) throws Exception {
-    try {
-      client.delete(ByteString.copyFromUtf8(key));
-    } catch (Exception e) {
-      logger.error("[tikv-del] del fail key {},", e);
-      return false;
-    }
+    client.delete(ByteString.copyFromUtf8(key));
     return true;
   }
 
@@ -95,7 +95,7 @@ public class DefaultRawTikvClient implements KVClient {
 
     }
     @Override
-    protected int queryData() {
+    public int queryData() {
       List<KvPair> result = this.client.scan(
           ByteString.copyFromUtf8(indexKey),
           ByteString.copyFromUtf8(endKey),

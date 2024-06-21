@@ -12,8 +12,6 @@ import org.junit.Assert;
 public abstract class AbstractKVTest implements CreateKVClientTest {
     KVClient client;
 
-
-
     public void before() throws Exception {
       this.client = createClient();
     }

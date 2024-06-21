@@ -3,7 +3,8 @@ package latte.lib.api.kv.scan;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
+import jdk.nashorn.internal.objects.annotations.Getter;
+import jdk.nashorn.internal.objects.annotations.Setter;
 
 public abstract class AbstractScanIterator<T> implements Iterator<T> {
 
@@ -20,7 +21,7 @@ public abstract class AbstractScanIterator<T> implements Iterator<T> {
 
   protected List<T> data = new LinkedList<>();
 
-  protected abstract int queryData();
+  public abstract int queryData();
   @Override
   public boolean hasNext() {
     if (data.size() > 0) {
@@ -35,5 +36,17 @@ public abstract class AbstractScanIterator<T> implements Iterator<T> {
   @Override
   public T next() {
     return data.remove(0);
+  }
+
+  public String getStartKey() {
+    return startKey;
+  }
+
+  public String getEndKey() {
+    return endKey;
+  }
+
+  public int getLimit() {
+    return limit;
   }
 }

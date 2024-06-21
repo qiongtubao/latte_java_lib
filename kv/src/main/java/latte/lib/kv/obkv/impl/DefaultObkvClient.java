@@ -1,19 +1,14 @@
 package latte.lib.kv.obkv.impl;
 
-import static com.alipay.oceanbase.rpc.filter.ObTableFilterFactory.compareVal;
 import static com.alipay.oceanbase.rpc.mutation.MutationFactory.colVal;
 import static com.alipay.oceanbase.rpc.mutation.MutationFactory.row;
 
 import com.alipay.oceanbase.rpc.ObTableClient;
-import com.alipay.oceanbase.rpc.filter.ObCompareOp;
-import com.alipay.oceanbase.rpc.filter.ObTableValueFilter;
 import com.alipay.oceanbase.rpc.mutation.BatchOperation;
-import com.alipay.oceanbase.rpc.mutation.Delete;
 import com.alipay.oceanbase.rpc.mutation.InsertOrUpdate;
 import com.alipay.oceanbase.rpc.mutation.result.BatchOperationResult;
 import com.alipay.oceanbase.rpc.mutation.result.MutationResult;
 import com.alipay.oceanbase.rpc.stream.QueryResultSet;
-import com.alipay.oceanbase.rpc.table.api.TableBatchOps;
 import com.alipay.oceanbase.rpc.table.api.TableQuery;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -24,6 +19,9 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import latte.lib.api.kv.KVClient;
 import latte.lib.api.kv.scan.AbstractScanIterator;
+import latte.lib.api.monitor.Monitor;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /* 测试表schema:
@@ -33,9 +31,14 @@ CREATE TABLE IF NOT EXISTS `kv_table` (
     PRIMARY KEY (`key`)
 );
 */
+
+@Setter
+@Getter
 public class DefaultObkvClient implements KVClient {
   ObTableClient client;
   String tableName;
+
+  Monitor monitor;
 
   public DefaultObkvClient(ObTableClient client, String tableName) {
     this.client = client;
@@ -47,9 +50,7 @@ public class DefaultObkvClient implements KVClient {
   String valName = "val";
   Logger logger = LoggerFactory.getLogger(DefaultObkvClient.class);
   @Override
-  public boolean set(String key, String value) {
-
-    try {
+  public boolean set(String key, String value) throws Exception {
 //      long rows = client.insertOrUpdate(tableName, key, new String[]{valName}, new Object[]{value});
       MutationResult result = client.insertOrUpdate(tableName).setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))))
           .addMutateColVal(colVal(valName, value.getBytes(StandardCharsets.UTF_8))).execute();
@@ -57,16 +58,11 @@ public class DefaultObkvClient implements KVClient {
         logger.error("[obkv-set]fail to put kv data, rows != 1");
         return false;
       }
-    } catch (Exception e) {
-      logger.error("[obkv-set]fail to put kv data: ", e);
-      return false;
-    }
-    return true;
+      return true;
   }
 
   @Override
-  public String get(String key) {
-    try {
+  public String get(String key) throws Exception {
       TableQuery query = client.query(tableName);
       query.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
       query.select(valName);
@@ -75,18 +71,12 @@ public class DefaultObkvClient implements KVClient {
         return (String)result.getRow().get(valName);
       }
       return null;
-    } catch (Exception e) {
-      logger.error("[obkv-get]fail to get kv key: {}", key,e);
-      return null;
-    }
   }
 
   //再想想 是否使用batch
   @Override
-  public List<String> mget(List<String> keys) {
-    try {
-
-      BatchOperation batchOps = client.batchOperation(tableName);
+  public List<String> mget(List<String> keys) throws Exception {
+     BatchOperation batchOps = client.batchOperation(tableName);
       for(String key: keys) {
         TableQuery query = client.query(tableName);
         query.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
@@ -101,16 +91,12 @@ public class DefaultObkvClient implements KVClient {
       return retObj.getResults().stream().map(o -> {
         return (String)(((MutationResult) o).getOperationRow().getMap()).get(valName);
       }).collect(Collectors.toList());
-    } catch (Exception e) {
-      logger.error("[obkv-mget]fail to get kv data:", e);
-      return new LinkedList<>();
-    }
   }
 
   //再想想 是否使用batch
   @Override
-  public boolean mset(Map<String, String> map) {
-    try {
+  public boolean mset(Map<String, String> map) throws Exception {
+
       BatchOperation batchOps = client.batchOperation(tableName);
       for(Entry<String, String> kv: map.entrySet()) {
         InsertOrUpdate insertOrUpdate = new InsertOrUpdate();
@@ -121,20 +107,14 @@ public class DefaultObkvClient implements KVClient {
       BatchOperationResult
           retObj = batchOps.execute();
       if (retObj.size() != map.size()) {
-        logger.error("[obkv-mset]fail to put kv data, rows != 1");
+         logger.error("[obkv-mset]fail to put kv data, rows != 1, {}", map);
          return false;
       }
       return true;
-    } catch (Exception e) {
-      logger.error("[obkv-mset]fail to put kv data:", e);
-      return false;
-    }
-
   }
 
   @Override
-  public boolean del(String key) {
-    try {
+  public boolean del(String key) throws Exception {
 //      BatchOperation batchOperation = this.client.batchOperation(tableName);
 //      Delete deleteOperation = new Delete();
 //      deleteOperation.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
@@ -150,11 +130,7 @@ public class DefaultObkvClient implements KVClient {
       if(result.getAffectedRows() == 0) {
         return false;
       }
-    } catch (Exception e) {
-      logger.error("[obkv-delete]fail del kv {}, error:", key, e);
-      return false;
-    }
-    return true;
+      return true;
   }
 
   static class ObkvScanIterator extends AbstractScanIterator {
@@ -169,7 +145,7 @@ public class DefaultObkvClient implements KVClient {
     }
 
     @Override
-    protected int queryData() {
+    public int queryData() {
       TableQuery query = client.query(tableName);
       query.limit(offline, limit);
       query.addScanRange(startKey, endKey);
