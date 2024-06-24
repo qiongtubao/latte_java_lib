@@ -26,7 +26,7 @@ public abstract class AbstractIntervalDynamicConfig extends AbstractDynamicConfi
       AbstractDynamicConfig self = this;
       scheduledExecutorService.scheduleAtFixedRate(() -> {
         this.updateCached();
-      }, 0, this.interval, TimeUnit.SECONDS);
+      }, this.interval, this.interval, TimeUnit.SECONDS);
     }
 
   abstract Map<String,Object> loadCached() throws Exception;
