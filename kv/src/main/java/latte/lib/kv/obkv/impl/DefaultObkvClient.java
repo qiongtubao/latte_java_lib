@@ -64,8 +64,8 @@ public class DefaultObkvClient implements KVClient {
   @Override
   public String get(String key) throws Exception {
       TableQuery query = client.query(tableName);
-      query.setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))));
-      query.select(valName);
+      query.addScanRange(key, key);
+//      query.select("key",valName);
       QueryResultSet result = query.execute();
       if (result.next()) {
         return (String)result.getRow().get(valName);

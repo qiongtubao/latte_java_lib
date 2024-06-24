@@ -40,10 +40,14 @@ public class KVClientDelegate implements KVClient {
   @Override
   public Iterator<String> scanKey(String key, String end, int limit) {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() + ".scanKey");
-    AbstractScanIterator<String> result = null;
+    Iterator<String> result = null;
     try {
-      result = (AbstractScanIterator)kvClient.scanKey(key, end, limit);
-      result = new ScanIteratorDelegate<>(result, monitor);
+
+      result = kvClient.scanKey(key, end, limit);
+      if (result instanceof  AbstractScanIterator) {
+        result = new ScanIteratorDelegate<>((AbstractScanIterator)result, monitor);
+      }
+
     } catch (Exception e) {
       transaction.setFail(e);
       throw e;

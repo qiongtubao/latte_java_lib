@@ -8,10 +8,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 
-public abstract class AbstractQPSTask extends AbstractTask {
+public abstract class AbstractQpsTask extends AbstractTask {
     public static Random random = new Random();
 
-    public AbstractQPSTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled,
+    public AbstractQpsTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled,
         ExecutorService executors) {
         super(config, scheduled, executors);
         this.thread = config.getIntArg("thread");

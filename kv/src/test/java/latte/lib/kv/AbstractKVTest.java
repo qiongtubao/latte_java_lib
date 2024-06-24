@@ -22,7 +22,7 @@ public abstract class AbstractKVTest implements CreateKVClientTest {
     Assert.assertEquals("1", client.get("a"));
     Assert.assertEquals(true, client.del("a"));
     Assert.assertEquals(null, client.get("a"));
-    client.del("a");
+
   }
 
 
