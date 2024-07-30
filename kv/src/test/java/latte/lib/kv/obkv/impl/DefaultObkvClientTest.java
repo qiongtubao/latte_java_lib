@@ -1,4 +1,5 @@
 package latte.lib.kv.obkv.impl;
+import com.alipay.sofa.common.log.LoggerSpaceManager;
 import latte.lib.kv.AbstractKVTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +10,7 @@ public class DefaultObkvClientTest extends AbstractKVTest implements  CreateObkv
 
   @Before
   public void before() throws Exception {
+//    System.setProperty("logging.level.oceanbase-table-client", "off");
     super.before();
   }
 

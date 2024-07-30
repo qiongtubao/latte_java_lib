@@ -8,6 +8,8 @@ import latte.lib.api.kv.scan.AbstractScanIterator;
 import latte.lib.api.monitor.Monitor;
 import latte.lib.api.monitor.Transaction;
 import latte.lib.common.serialization.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *  这个对象处理委托处理monitor外部封装
@@ -25,8 +27,8 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() + ".del");
     boolean result = false;
     try {
-       result = kvClient.del(key);
        transaction.addTag("key", key);
+       result = kvClient.del(key);
        transaction.setSuccess();
     } catch (Exception e) {
       transaction.setFail(e);
@@ -36,16 +38,16 @@ public class KVClientDelegate implements KVClient {
     }
     return result;
   }
-
+  static Logger logger = LoggerFactory.getLogger(KVClientDelegate.class);
   @Override
   public Iterator<String> scanKey(String key, String end, int limit) {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() + ".scanKey");
     Iterator<String> result = null;
     try {
 
-      result = kvClient.scanKey(key, end, limit);
-      if (result instanceof  AbstractScanIterator) {
-        result = new ScanIteratorDelegate<>((AbstractScanIterator)result, monitor);
+        Iterator<String> result1 = this.kvClient.scanKey(key, end, limit);
+      if (result1 instanceof AbstractScanIterator) {
+          result = new ScanIteratorDelegate<>((AbstractScanIterator)result1, monitor);
       }
 
     } catch (Exception e) {
@@ -62,9 +64,9 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".set");
     boolean result = false;
     try {
-      result = kvClient.set(key, value);
       transaction.addTag("key", key);
       transaction.addTag("value", value);
+      result = kvClient.set(key, value);
       transaction.setSuccess();
     } catch (Exception e) {
       transaction.setFail(e);
@@ -80,8 +82,8 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".get");
     String result = null;
     try {
-      result = kvClient.get(key);
       transaction.addTag("key", key);
+      result = kvClient.get(key);
       transaction.setSuccess();
     } catch (Exception e) {
       transaction.setFail(e);
@@ -97,8 +99,8 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".mget");
     List<String> result = null;
     try {
-      result = kvClient.mget(keys);
       transaction.addTag("keys", JsonUtils.encode(keys));
+      result = kvClient.mget(keys);
       transaction.setSuccess();
     } catch (Exception e) {
       transaction.setFail(e);
@@ -113,8 +115,8 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".mset");
     boolean result = false;
     try {
-      result = kvClient.mset(map);
       transaction.addTag("keys", JsonUtils.encode(map));
+      result = kvClient.mset(map);
       transaction.setSuccess();
     } catch (Exception e) {
       transaction.setFail(e);

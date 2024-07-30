@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import jdk.nashorn.internal.objects.annotations.Getter;
 import jdk.nashorn.internal.objects.annotations.Setter;
-
 public abstract class AbstractScanIterator<T> implements Iterator<T> {
 
   protected String startKey;
@@ -48,5 +47,9 @@ public abstract class AbstractScanIterator<T> implements Iterator<T> {
 
   public int getLimit() {
     return limit;
+  }
+
+  public List<T> getData() {
+    return data;
   }
 }

@@ -1,5 +1,6 @@
 package latte.lib.kv.obkv;
 
+import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ public class ObkvClientInfo {
     String password;
     String sysUserName;
     String sysPassword;
+    Map<String, String> properties;
 
   @Override
   public boolean equals(Object o) {

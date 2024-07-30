@@ -1,5 +1,6 @@
 package latte.lib.kv.obkv.impl;
 
+import java.util.HashMap;
 import latte.lib.api.kv.KVClient;
 import latte.lib.kv.CreateKVClientTest;
 import latte.lib.kv.obkv.ObkvClientFactory;
@@ -16,6 +17,7 @@ public  interface CreateObkvClientTest extends CreateKVClientTest {
       info.setPassword("");
       info.setSysUserName("root@sys");
       info.setPassword("");
+      info.setProperties(new HashMap<>());
       return  ObkvClientFactory.createClient(info, "kv_table");
     }
 }

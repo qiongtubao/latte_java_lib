@@ -63,12 +63,15 @@ public class DefaultObkvClient implements KVClient {
 
   @Override
   public String get(String key) throws Exception {
-      TableQuery query = client.query(tableName);
-      query.addScanRange(key, key);
-//      query.select("key",valName);
-      QueryResultSet result = query.execute();
-      if (result.next()) {
-        return (String)result.getRow().get(valName);
+//      TableQuery query = client.query(tableName);
+//      query.addScanRange(key, key);
+//      QueryResultSet result = query.execute();
+//    if (result.next()) {
+//      return (String)result.getRow().get(valName);
+//    }
+      Map<String, Object> result = client.get(tableName, key, new String[]{valName});
+      if (result != null && result.size() !=0 ) {
+          return (String)result.get(valName);
       }
       return null;
   }

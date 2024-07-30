@@ -1,8 +1,10 @@
 package latte.lib.kv.obkv;
 
 import com.alipay.oceanbase.rpc.ObTableClient;
+import com.alipay.oceanbase.rpc.property.Property;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import latte.lib.api.kv.KVClient;
 import latte.lib.kv.obkv.impl.DefaultObkvClient;
 import org.slf4j.Logger;
@@ -22,6 +24,12 @@ public class ObkvClientFactory {
     client.setSysUserName(info.getSysUserName());
     client.setPassword(info.getPassword());
     client.setSysPassword(info.getSysPassword());
+    Map<String,String> properties = info.getProperties();
+    if (properties != null && properties.size() != 0) {
+      for (Entry<String, String> kv : info.getProperties().entrySet()) {
+        client.addProperty(kv.getKey(), kv.getValue());
+      }
+    }
 //        client.setRpcExecuteTimeout(10000);
 //        client.setRuntimeMaxWait(10000);
     client.init();

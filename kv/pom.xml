@@ -50,7 +50,7 @@
 
     <dependency>
       <groupId>com.oceanbase</groupId>
-      <artifactId>obkv-table-client</artifactId>
+      <artifactId>latte-obkv-table-client</artifactId>
       <version>1.2.12</version>
     </dependency>
     <dependency>

@@ -53,7 +53,7 @@ public class AbstractTask implements Task {
         if (!initialized.get()) {
             throw new IllegalStateException("[start]task: " + name() + ", is not initialized");
         }
-
+        if (stopped.get() == true) return;
         if (started.compareAndSet(false, true)) {
             stopped.set(false);
             doStart();
@@ -61,7 +61,7 @@ public class AbstractTask implements Task {
     }
 
     @Override
-    public void stop() {
+    public void stop() throws IllegalStateException {
 
         if (!initialized.get()) {
             throw new IllegalStateException("[stop]task: " + name() + ", is not initialized");
@@ -89,11 +89,11 @@ public class AbstractTask implements Task {
     }
 
     protected void doStart() {
-
+        logger.info("{} {} start!", this.getClass().getSimpleName(), this);
     }
 
     protected void doStop() {
-        logger.info("{} stop!", this.getClass().getSimpleName());
+        logger.info("{} {} stop!", this.getClass().getSimpleName(), this);
     }
 
     protected void doInitialize() throws Exception {

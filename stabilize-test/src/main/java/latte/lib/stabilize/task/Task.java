@@ -7,7 +7,7 @@ public interface Task {
 
     void start();
 
-    void stop();
+    void stop() throws IllegalStateException;
 
     String name();
 
