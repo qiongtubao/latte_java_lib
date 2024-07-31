@@ -10,8 +10,8 @@ public abstract class AbstractTimerTask extends AbstractTask{
 
     private Future<?> future;
 
-    public AbstractTimerTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled, ExecutorService executors) {
-        super(config, scheduled, executors);
+    public AbstractTimerTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled) {
+        super(config, scheduled);
         this.qps = config.getIntArg("qps");
     }
 
@@ -27,7 +27,7 @@ public abstract class AbstractTimerTask extends AbstractTask{
         long interval = TimeUnit.SECONDS.toNanos(1) / qps;
         future = scheduled.scheduleAtFixedRate(() -> {
             if (!Thread.currentThread().isInterrupted()) {
-                executors.execute(() -> {
+                scheduled.execute(() -> {
                     try {
                         doTest();
                     } catch (Throwable t) {

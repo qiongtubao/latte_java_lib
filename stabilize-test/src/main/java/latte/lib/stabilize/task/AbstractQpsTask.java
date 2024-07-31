@@ -14,13 +14,10 @@ public abstract class AbstractQpsTask extends AbstractTask {
 
     AtomicInteger atomic = new AtomicInteger(0);
 
-    public AbstractQpsTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled,
-        ExecutorService executors) {
-        super(config, scheduled, executors);
+    public AbstractQpsTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled) {
+        super(config, scheduled);
         this.thread = config.getIntArg("thread");
         this.qps = config.getDoubleArg("qps");
-        this.scheduledExecutorService = scheduled;
-        this.executorService = executors;
 
         queue = new ArrayBlockingQueue<>(config.getIntArg("qps"));
     }
@@ -30,7 +27,6 @@ public abstract class AbstractQpsTask extends AbstractTask {
 
     protected ScheduledExecutorService scheduledExecutorService;
 
-    protected ExecutorService executorService;
 
 
 
@@ -47,9 +43,6 @@ public abstract class AbstractQpsTask extends AbstractTask {
         return scheduledExecutorService;
     }
 
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
 
 
     public abstract Runnable doTest();
@@ -68,7 +61,7 @@ public abstract class AbstractQpsTask extends AbstractTask {
     BlockingQueue<RunEvent> queue;
     @Override
     public void doStart() {
-        executorService.execute(() -> {
+        scheduled.execute(() -> {
             logger.info("[thread-{}] {} start  assignment", Thread.currentThread(), getClass().getSimpleName());
             long startTime = System.nanoTime();
             atomic.incrementAndGet();
@@ -112,7 +105,7 @@ public abstract class AbstractQpsTask extends AbstractTask {
             logger.info("[thread-{}] {} stop  assignment", Thread.currentThread(), getClass().getSimpleName());
         });
         for(int j = 0; j < thread; j++) {
-            executorService.execute(() -> {
+            scheduled.execute(() -> {
                 atomic.incrementAndGet();
                 logger.info("[thread-{}] {} start exec task", Thread.currentThread(), getClass().getSimpleName());
                 while(!this.isStopped()) {

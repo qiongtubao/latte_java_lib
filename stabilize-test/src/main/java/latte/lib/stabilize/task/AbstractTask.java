@@ -29,12 +29,10 @@ public class AbstractTask implements Task {
 
     ScheduledThreadPoolExecutor scheduled;
 
-    ExecutorService executors;
-    public AbstractTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled, ExecutorService executors) {
+    public AbstractTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled) {
         this.config = config;
         this.name = getClass().getSimpleName();
         this.scheduled = scheduled;
-        this.executors = executors;
     }
 
 

@@ -13,15 +13,13 @@ public class TaskType {
         registers.put(name, glass);
     }
 
-    public static Task createTask(String name, TaskConfig config, ScheduledThreadPoolExecutor scheduled, ExecutorService executors) throws Exception {
-        Class<?>[] glassTypes = new Class[3];
-        Object[] glassParams = new Object[3];
+    public static Task createTask(String name, TaskConfig config, ScheduledThreadPoolExecutor scheduled) throws Exception {
+        Class<?>[] glassTypes = new Class[2];
+        Object[] glassParams = new Object[2];
         glassTypes[0] = TaskConfig.class;
         glassTypes[1] = ScheduledThreadPoolExecutor.class;
-        glassTypes[2] = ExecutorService.class;
         glassParams[0] = config;
         glassParams[1] = scheduled;
-        glassParams[2] = executors;
         Constructor<? extends Task> constructor = registers.get(name).getConstructor(glassTypes);
         return constructor.newInstance(glassParams);
     }

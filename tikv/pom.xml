@@ -117,6 +117,11 @@
             <artifactId>latte-tikv-client-java</artifactId>
             <version>3.3.5</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.tikv</groupId>-->
+<!--            <artifactId>tikv-client-java</artifactId>-->
+<!--            <version>3.3.5-ctrip.10</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

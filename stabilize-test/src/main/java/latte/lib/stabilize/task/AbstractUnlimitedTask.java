@@ -10,8 +10,8 @@ public abstract class AbstractUnlimitedTask extends AbstractTask {
     protected ExecutorService executorService;
 
     int threadnum;
-    public AbstractUnlimitedTask(TaskConfig config, ScheduledThreadPoolExecutor scheduledExecutorService, ExecutorService executorService) {
-        super(config, scheduledExecutorService, executorService);
+    public AbstractUnlimitedTask(TaskConfig config, ScheduledThreadPoolExecutor scheduledExecutorService) {
+        super(config, scheduledExecutorService);
         this.threadnum = config.getIntArg("threadnum");
     }
 

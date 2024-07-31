@@ -1,6 +1,7 @@
 package latte.lib.kv;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import latte.lib.api.kv.KVClient;
@@ -18,6 +19,8 @@ public class KVClientDelegate implements KVClient {
   KVClient kvClient;
 
   Monitor monitor;
+
+  Map<String, String> basicTags = new LinkedHashMap<>();
   public KVClientDelegate(KVClient kvClient, Monitor monitor) {
     this.kvClient = kvClient;
     this.monitor = monitor;
@@ -27,7 +30,11 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() + ".del");
     boolean result = false;
     try {
+       for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+         transaction.addTag(kv.getKey(), kv.getValue());
+       }
        transaction.addTag("key", key);
+       transaction.addTag("method", "del");
        result = kvClient.del(key);
        transaction.setSuccess();
     } catch (Exception e) {
@@ -44,10 +51,16 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() + ".scanKey");
     Iterator<String> result = null;
     try {
-
-        Iterator<String> result1 = this.kvClient.scanKey(key, end, limit);
+      for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+        transaction.addTag(kv.getKey(), kv.getValue());
+      }
+      transaction.addTag("scan_start", key);
+      transaction.addTag("scan_end", end);
+      transaction.addTag("limit", String.valueOf(limit));
+      transaction.addTag("method", "scanKey");
+      Iterator<String> result1 = this.kvClient.scanKey(key, end, limit);
       if (result1 instanceof AbstractScanIterator) {
-          result = new ScanIteratorDelegate<>((AbstractScanIterator)result1, monitor);
+          result = new ScanIteratorDelegate<>((AbstractScanIterator)result1, monitor, basicTags);
       }
 
     } catch (Exception e) {
@@ -64,8 +77,12 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".set");
     boolean result = false;
     try {
+      for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+        transaction.addTag(kv.getKey(), kv.getValue());
+      }
       transaction.addTag("key", key);
       transaction.addTag("value", value);
+      transaction.addTag("method", "set");
       result = kvClient.set(key, value);
       transaction.setSuccess();
     } catch (Exception e) {
@@ -82,7 +99,11 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".get");
     String result = null;
     try {
+      for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+        transaction.addTag(kv.getKey(), kv.getValue());
+      }
       transaction.addTag("key", key);
+      transaction.addTag("method", "get");
       result = kvClient.get(key);
       transaction.setSuccess();
     } catch (Exception e) {
@@ -99,7 +120,11 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".mget");
     List<String> result = null;
     try {
+      for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+        transaction.addTag(kv.getKey(), kv.getValue());
+      }
       transaction.addTag("keys", JsonUtils.encode(keys));
+      transaction.addTag("method", "mget");
       result = kvClient.mget(keys);
       transaction.setSuccess();
     } catch (Exception e) {
@@ -115,7 +140,11 @@ public class KVClientDelegate implements KVClient {
     Transaction transaction = monitor.getTransaction(this.kvClient.getClass().getSimpleName() +".mset");
     boolean result = false;
     try {
+      for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+        transaction.addTag(kv.getKey(), kv.getValue());
+      }
       transaction.addTag("keys", JsonUtils.encode(map));
+      transaction.addTag("method", "mset");
       result = kvClient.mset(map);
       transaction.setSuccess();
     } catch (Exception e) {
@@ -124,5 +153,9 @@ public class KVClientDelegate implements KVClient {
       transaction.complete();
     }
     return result;
+  }
+  public KVClientDelegate addBasicTag(String k, String v) {
+    basicTags.put(k,v);
+    return this;
   }
 }

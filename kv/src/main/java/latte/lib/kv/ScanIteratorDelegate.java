@@ -6,6 +6,8 @@ import latte.lib.api.monitor.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 public class ScanIteratorDelegate<T> extends AbstractScanIterator<T> {
 
   AbstractScanIterator<T> scanIterator;
@@ -13,20 +15,39 @@ public class ScanIteratorDelegate<T> extends AbstractScanIterator<T> {
   Monitor monitor;
 
   boolean isEnd = false;
+
+  Map<String,String> basicTags;
   public ScanIteratorDelegate(
         AbstractScanIterator<T> scanIterator,
-        Monitor monitor
+        Monitor monitor,
+        Map<String, String> basicTags
   ) {
     super(scanIterator.getStartKey(), scanIterator.getEndKey(), scanIterator.getLimit());
     this.monitor = monitor;
     this.scanIterator = scanIterator;
+    this.basicTags = basicTags;
   }
 
 
 
   @Override
   public T next() {
-    return scanIterator.next();
+    Transaction transaction = monitor.getTransaction(this.scanIterator.getClass().getSimpleName() + ".next");
+    T result = null;
+    try {
+      for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+        transaction.addTag(kv.getKey(), kv.getValue());
+      }
+      transaction.addTag("method", "scanIterator.next");
+      result = scanIterator.next();
+      transaction.setSuccess();
+    } catch (Exception e) {
+      transaction.setFail(e);
+      throw e;
+    } finally {
+      transaction.complete();
+    }
+    return result;
   }
   static Logger logger = LoggerFactory.getLogger(ScanIteratorDelegate.class);
 
@@ -45,6 +66,10 @@ public class ScanIteratorDelegate<T> extends AbstractScanIterator<T> {
     }
     Transaction transaction = monitor.getTransaction(this.scanIterator.getClass().getSimpleName() + ".scanQueryData");
     try {
+      for(Map.Entry<String, String> kv: basicTags.entrySet()) {
+        transaction.addTag(kv.getKey(), kv.getValue());
+      }
+      transaction.addTag("method", "scanIterator.queryData");
       int result = scanIterator.queryData();
       if (result < scanIterator.getLimit()) {
         isEnd = true;

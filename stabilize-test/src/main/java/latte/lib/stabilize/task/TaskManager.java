@@ -3,10 +3,8 @@ package latte.lib.stabilize.task;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
+
 import latte.lib.stabilize.StablizeTestConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +17,10 @@ public class TaskManager {
     Map<String, Map<String, Task>> tasks = new LinkedHashMap<>();
 
     ScheduledThreadPoolExecutor scheduled;
-    ExecutorService executors;
 
     Logger logger = LoggerFactory.getLogger(TaskManager.class);
     public TaskManager(StablizeTestConfig config) {
         scheduled = new ScheduledThreadPoolExecutor(config.getScheduledNum());
-        executors =  Executors.newFixedThreadPool(config.getExecutorNum());
         config.getTasks().forEach((clusterName, confs) -> {
             Map<String, Task> ts = new LinkedHashMap<>();
             confs.forEach((taskName, conf) -> {
@@ -44,7 +40,7 @@ public class TaskManager {
 
     public Task createTask(String clusterName,String taskName, TaskConfig conf) throws Exception {
         Task task = null;
-        task = TaskType.createTask(taskName, conf, scheduled, executors);
+        task = TaskType.createTask(taskName, conf, scheduled);
         task.initialize();
         task.start();
         return task;
@@ -62,9 +58,6 @@ public class TaskManager {
         this.scheduled.setCorePoolSize(num);
     }
 
-    public void setExecutorsNum(int num) {
-        ((ThreadPoolExecutor)(executors)).setCorePoolSize(num);
-    }
 
 
     public int updateTasks(Map<String, Map<String, TaskConfig>> config) {
