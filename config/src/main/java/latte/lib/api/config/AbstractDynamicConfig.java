@@ -7,21 +7,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import latte.lib.common.serialization.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class AbstractDynamicConfig implements DynamicConfig {
+  static Logger logger = LoggerFactory.getLogger(AbstractDynamicConfig.class);
   Map<String, Object> cached;
 
   Map<String, Map<Class, List<BiConsumer>>> listens = new LinkedHashMap<>();
   void setCached(Map<String, Object> cached) throws Exception {
     Map<String, Object> oldCached = this.cached;
     this.cached = cached;
+    boolean changed = false;
     for(Entry<String,Object> kv : oldCached.entrySet()) {
       String key = kv.getKey();
       String value = JsonUtils.encode(kv.getValue());
       String nowVal = JsonUtils.encode(cached.get(key));
       if (!value.equals(nowVal)) {
         notify(key, value, nowVal);
+        changed = true;
       }
     }
     for(Entry<String,Object> kv : cached.entrySet()) {
@@ -30,7 +35,14 @@ public abstract class AbstractDynamicConfig implements DynamicConfig {
       if (oldVal == null) {
         String value = JsonUtils.encode(kv.getValue());
         notify(key, null, value);
+        changed = true;
       }
+    }
+    if (changed) {
+        logger.info("[dynamic-config] change {} -> {}",
+            JsonUtils.encode(oldCached),
+            JsonUtils.encode(cached)
+        );
     }
 
   }

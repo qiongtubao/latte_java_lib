@@ -111,7 +111,7 @@ public class HttpRequester implements Requester {
   @Override
   public <K, V> Map<K, V> requestMap(Object requestInfo, Class<K> k, Class<V> v) throws Exception {
     HttpRequestInfo info = (HttpRequestInfo) requestInfo;
-    logger.info("[latte]request map {} {} {}", info.getPath(), info.getMethod());
+    logger.debug("[latte]request map {} {} {}", info.getPath(), info.getMethod());
     ResponseEntity<Map<K,V>> response = restOperations.exchange(
         info.getPath(),
         info.getMethod(),
@@ -120,7 +120,7 @@ public class HttpRequester implements Requester {
         }
     );
     Map<K,V> result = response.getBody();
-    logger.info("[latte]request map {}", result, response.getStatusCode());
+    logger.debug("[latte]request map {}", result, response.getStatusCode());
     return result;
   }
 }

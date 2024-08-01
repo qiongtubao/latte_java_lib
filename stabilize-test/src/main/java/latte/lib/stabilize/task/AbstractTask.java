@@ -4,6 +4,7 @@ package latte.lib.stabilize.task;
 
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,9 +28,9 @@ public class AbstractTask implements Task {
 
     TaskConfig config;
 
-    ScheduledThreadPoolExecutor scheduled;
+    ScheduledExecutorService scheduled;
 
-    public AbstractTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled) {
+    public AbstractTask(TaskConfig config, ScheduledExecutorService scheduled) {
         this.config = config;
         this.name = getClass().getSimpleName();
         this.scheduled = scheduled;

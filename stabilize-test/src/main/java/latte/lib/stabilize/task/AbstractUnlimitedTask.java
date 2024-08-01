@@ -5,12 +5,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public abstract class AbstractUnlimitedTask extends AbstractTask {
-    protected ScheduledExecutorService scheduledExecutorService;
 
-    protected ExecutorService executorService;
 
     int threadnum;
-    public AbstractUnlimitedTask(TaskConfig config, ScheduledThreadPoolExecutor scheduledExecutorService) {
+    public AbstractUnlimitedTask(TaskConfig config, ScheduledExecutorService scheduledExecutorService) {
         super(config, scheduledExecutorService);
         this.threadnum = config.getIntArg("threadnum");
     }
@@ -20,7 +18,7 @@ public abstract class AbstractUnlimitedTask extends AbstractTask {
     @Override
     public void doStart() {
         for(int i = 0; i < this.threadnum ;i++) {
-            executorService.execute(() -> {
+            scheduled.execute(() -> {
                 while (!isStopped()) {
                     try {
                         doTest();

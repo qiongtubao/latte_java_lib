@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class TaskType {
@@ -13,11 +14,11 @@ public class TaskType {
         registers.put(name, glass);
     }
 
-    public static Task createTask(String name, TaskConfig config, ScheduledThreadPoolExecutor scheduled) throws Exception {
+    public static Task createTask(String name, TaskConfig config, ScheduledExecutorService scheduled) throws Exception {
         Class<?>[] glassTypes = new Class[2];
         Object[] glassParams = new Object[2];
         glassTypes[0] = TaskConfig.class;
-        glassTypes[1] = ScheduledThreadPoolExecutor.class;
+        glassTypes[1] = ScheduledExecutorService.class;
         glassParams[0] = config;
         glassParams[1] = scheduled;
         Constructor<? extends Task> constructor = registers.get(name).getConstructor(glassTypes);

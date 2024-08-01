@@ -2,6 +2,7 @@ package latte.lib.stabilize.task;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -10,7 +11,7 @@ public abstract class AbstractTimerTask extends AbstractTask{
 
     private Future<?> future;
 
-    public AbstractTimerTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled) {
+    public AbstractTimerTask(TaskConfig config, ScheduledExecutorService scheduled) {
         super(config, scheduled);
         this.qps = config.getIntArg("qps");
     }

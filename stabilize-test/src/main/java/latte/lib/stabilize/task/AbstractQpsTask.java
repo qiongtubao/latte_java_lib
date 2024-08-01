@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import latte.lib.common.concurrent.LatteScheduledThreadPoolExecutor;
 
 
 public abstract class AbstractQpsTask extends AbstractTask {
@@ -14,7 +15,7 @@ public abstract class AbstractQpsTask extends AbstractTask {
 
     AtomicInteger atomic = new AtomicInteger(0);
 
-    public AbstractQpsTask(TaskConfig config, ScheduledThreadPoolExecutor scheduled) {
+    public AbstractQpsTask(TaskConfig config, ScheduledExecutorService scheduled) {
         super(config, scheduled);
         this.thread = config.getIntArg("thread");
         this.qps = config.getDoubleArg("qps");

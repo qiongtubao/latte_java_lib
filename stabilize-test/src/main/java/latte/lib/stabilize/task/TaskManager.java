@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 
+import latte.lib.common.concurrent.LatteScheduledThreadPoolExecutor;
 import latte.lib.stabilize.StablizeTestConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,11 +17,16 @@ import org.slf4j.LoggerFactory;
 public class TaskManager {
     Map<String, Map<String, Task>> tasks = new LinkedHashMap<>();
 
-    ScheduledThreadPoolExecutor scheduled;
+    LatteScheduledThreadPoolExecutor scheduled;
 
     Logger logger = LoggerFactory.getLogger(TaskManager.class);
     public TaskManager(StablizeTestConfig config) {
-        scheduled = new ScheduledThreadPoolExecutor(config.getScheduledNum());
+        scheduled = new LatteScheduledThreadPoolExecutor(
+            "taskManager",
+            5,
+            config.getScheduledNum(),
+            60L
+        );
         config.getTasks().forEach((clusterName, confs) -> {
             Map<String, Task> ts = new LinkedHashMap<>();
             confs.forEach((taskName, conf) -> {
@@ -55,7 +61,7 @@ public class TaskManager {
     }
 
     public void setScheduledNum(int num) {
-        this.scheduled.setCorePoolSize(num);
+        this.scheduled.setMaximumPoolSize(num);
     }
 
 
