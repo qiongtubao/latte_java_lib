@@ -136,6 +136,11 @@ public class DefaultObkvClient implements KVClient {
       return true;
   }
 
+  @Override
+  public void close() throws Exception {
+    this.client.close();
+  }
+
   static class ObkvScanIterator extends AbstractScanIterator {
     ObTableClient client;
     String tableName;

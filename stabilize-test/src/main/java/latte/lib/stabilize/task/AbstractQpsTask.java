@@ -13,7 +13,7 @@ import latte.lib.common.concurrent.LatteScheduledThreadPoolExecutor;
 public abstract class AbstractQpsTask extends AbstractTask {
     public static Random random = new Random();
 
-    AtomicInteger atomic = new AtomicInteger(0);
+    protected  AtomicInteger atomic = new AtomicInteger(0);
 
     public AbstractQpsTask(TaskConfig config, ScheduledExecutorService scheduled) {
         super(config, scheduled);

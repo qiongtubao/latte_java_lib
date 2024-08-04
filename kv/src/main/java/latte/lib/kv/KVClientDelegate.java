@@ -158,4 +158,9 @@ public class KVClientDelegate implements KVClient {
     basicTags.put(k,v);
     return this;
   }
+
+  @Override
+  public void close() throws Exception {
+    kvClient.close();
+  }
 }

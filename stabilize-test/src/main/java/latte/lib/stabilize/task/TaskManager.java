@@ -17,16 +17,19 @@ import org.slf4j.LoggerFactory;
 public class TaskManager {
     Map<String, Map<String, Task>> tasks = new LinkedHashMap<>();
 
-    LatteScheduledThreadPoolExecutor scheduled;
+    ScheduledThreadPoolExecutor scheduled;
 
     Logger logger = LoggerFactory.getLogger(TaskManager.class);
     public TaskManager(StablizeTestConfig config) {
-        scheduled = new LatteScheduledThreadPoolExecutor(
-            "taskManager",
-            5,
-            config.getScheduledNum(),
-            60L
-        );
+//        scheduled = new LatteScheduledThreadPoolExecutor(
+//            "taskManager",
+//            10,
+//            config.getScheduledNum(),
+//            60L
+//        );
+        scheduled = new ScheduledThreadPoolExecutor(config.getExecutorNum());
+        scheduled.setMaximumPoolSize(config.getScheduledNum());
+        scheduled.setKeepAliveTime(60, TimeUnit.SECONDS);
         config.getTasks().forEach((clusterName, confs) -> {
             Map<String, Task> ts = new LinkedHashMap<>();
             confs.forEach((taskName, conf) -> {
@@ -62,6 +65,10 @@ public class TaskManager {
 
     public void setScheduledNum(int num) {
         this.scheduled.setMaximumPoolSize(num);
+    }
+
+    public void setExecutorNum(int num) {
+        this.scheduled.setCorePoolSize(num);
     }
 
 

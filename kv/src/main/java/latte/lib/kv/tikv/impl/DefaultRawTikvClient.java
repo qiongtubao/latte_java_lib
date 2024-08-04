@@ -70,6 +70,11 @@ public class DefaultRawTikvClient implements KVClient {
     return true;
   }
 
+  @Override
+  public void close() {
+    client.close();
+  }
+
   static class RawTikvScanIterator extends AbstractScanIterator {
 
     String indexKey;
