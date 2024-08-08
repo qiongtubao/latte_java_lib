@@ -19,4 +19,9 @@ public class UserTest extends latte.lib.sql.UserTest {
       return SqliteClient
           .createSqliteClient(DB_URL);
   }
+
+  @Test
+  public void insert() throws Exception {
+      super.insert();
+  }
 }

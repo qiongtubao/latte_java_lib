@@ -1,7 +1,9 @@
 package latte.lib.sql;
 
 import latte.lib.api.db.sql.annotation.Column;
+import latte.lib.api.db.sql.annotation.Id;
 import latte.lib.api.db.sql.annotation.Table;
+import latte.lib.api.db.sql.annotation.Type;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,9 +11,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User {
-  @Column(name = "name", nullable = false, length = 50)
+  @Id(name = "id")
+  int id;
+
+//  @Column(name = "name", nullable = false, length = 50)
   String name;
 
-  @Column(name = "age", nullable = false, type = "int")
+//  @Column(name = "age", nullable = false, type = Type.INTEGER)
   Integer age;
 }

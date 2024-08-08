@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" packages="com.ctrip.framework.triplog.shaded.client.appender">
+  <Properties>
+    <Property name="app">config-server</Property>
+  </Properties>
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="[${app}][%d][%p] - %m%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <!--        <Logger name="com" level="INFO">-->
+    <!--            <AppenderRef ref="RollingFileInfo"/>-->
+    <!--            <appender-ref ref="clogAppender4Log4j2"/>-->
+    <!--        </Logger>-->
+    <!--        <Logger name="org.tikv" level="INFO">-->
+    <!--            <AppenderRef ref="Async"/>-->
+    <!--            <AppenderRef ref="RollingFileInfo"/>-->
+    <!--            <appender-ref ref="clogAppender4Log4j2"/>-->
+    <!--        </Logger>-->
+    <Root level="INFO">
+      <appender-ref ref="Console"/>sss
+    </Root>
+  </Loggers>
+</Configuration>

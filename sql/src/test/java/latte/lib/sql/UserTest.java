@@ -2,17 +2,38 @@ package latte.lib.sql;
 
 import latte.lib.api.db.sql.SqlClient;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class UserTest {
     protected abstract SqlClient getClient() throws Exception ;
+    boolean printSql = true;
+    static Logger logger = LoggerFactory.getLogger(UserTest.class);
     String createTableSql() {
         SqlParser parser = new SqlParser(User.class);
         String sql = parser.createTable();
+        if (printSql) {
+            logger.info("[sql] create table : {}", sql);
+        }
         return sql;
     }
 
     public void createTable() throws Exception  {
         SqlClient client = getClient();
         client.exec(createTableSql());
+    }
+
+    public void insert() throws Exception {
+        User user = new User();
+        user.id = 1;
+        user.age= 100;
+        user.name = "zhangsan";
+        SqlClient client = getClient();
+        SqlParser parser = new SqlParser(User.class);
+        String sql = parser.insert(user);
+        if (printSql) {
+            logger.info("[sql] insert sql :{}", sql);
+        }
+        client.exec(sql);
     }
 }
