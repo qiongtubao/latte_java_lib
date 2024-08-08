@@ -17,6 +17,7 @@
         <module>api</module>
         <module>config</module>
         <module>kv</module>
+      <module>sql</module>
     </modules>
 
     <properties>
