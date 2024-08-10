@@ -1,11 +1,12 @@
 package latte.lib.stabilize.task;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 
-import latte.lib.common.concurrent.LatteScheduledThreadPoolExecutor;
+import latte.lib.common.thread.LatteScheduledThreadPoolExecutor;
 import latte.lib.stabilize.StablizeTestConfig;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,19 +18,20 @@ import org.slf4j.LoggerFactory;
 public class TaskManager {
     Map<String, Map<String, Task>> tasks = new LinkedHashMap<>();
 
-    ScheduledThreadPoolExecutor scheduled;
+    LatteScheduledThreadPoolExecutor scheduled;
 
     Logger logger = LoggerFactory.getLogger(TaskManager.class);
     public TaskManager(StablizeTestConfig config) {
-//        scheduled = new LatteScheduledThreadPoolExecutor(
-//            "taskManager",
-//            10,
-//            config.getScheduledNum(),
-//            60L
-//        );
-        scheduled = new ScheduledThreadPoolExecutor(config.getExecutorNum());
-        scheduled.setMaximumPoolSize(config.getScheduledNum());
-        scheduled.setKeepAliveTime(60, TimeUnit.SECONDS);
+        scheduled = new LatteScheduledThreadPoolExecutor(
+            "taskManager",
+            config.getScheduledNum(),
+            config.getExecutorMinNum(),
+            config.getExecutorMaxNum(),
+            60L
+        );
+//        scheduled = new ScheduledThreadPoolExecutor(config.getExecutorNum());
+//        scheduled.setMaximumPoolSize(config.getScheduledNum());
+//        scheduled.setKeepAliveTime(60, TimeUnit.SECONDS);
         config.getTasks().forEach((clusterName, confs) -> {
             Map<String, Task> ts = new LinkedHashMap<>();
             confs.forEach((taskName, conf) -> {
@@ -64,11 +66,14 @@ public class TaskManager {
     }
 
     public void setScheduledNum(int num) {
-        this.scheduled.setMaximumPoolSize(num);
+        this.scheduled.setScheduleCorePoolSize(num);
     }
 
-    public void setExecutorNum(int num) {
-        this.scheduled.setCorePoolSize(num);
+    public void setExecutorMinNum(int num) {
+        this.scheduled.setScheduleCorePoolSize(num);
+    }
+    public void setExecutorMaxNum(int num) {
+        this.scheduled.setExecutorMaximumPoolSize(num);
     }
 
 

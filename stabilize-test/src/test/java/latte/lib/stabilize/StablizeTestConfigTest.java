@@ -20,12 +20,13 @@ public class StablizeTestConfigTest {
             + "              }\n"
             + "          }\n"
             + "      },\n"
-            + "      \"executorNum\": 10,\n"
-            + "      \"scheduledNum\": 10\n"
+            + "      \"scheduledNum\": 10,\n"
+            + "      \"executorMinNum\": 10,\n"
+            + "      \"executorMaxNum\": 100\n"
             + "  }\n"
             + "}");
         StablizeTestConfig c = config.get("stabilize-test",StablizeTestConfig.class);
-        Assert.assertEquals(10, c.getExecutorNum());
+        Assert.assertEquals(10, c.getExecutorMinNum());
     }
 
 }

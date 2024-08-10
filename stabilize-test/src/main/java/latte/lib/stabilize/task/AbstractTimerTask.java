@@ -35,7 +35,15 @@ public abstract class AbstractTimerTask extends AbstractTask{
     @Override
     public void doStop() {
         if (future != null) {
-            future.cancel(true);
+            while(!future.cancel(true)) {
+                try {
+                    Thread.sleep(10);
+                } catch (Exception e) {
+
+                }
+                logger.error("[latte] {} cancel fail", this.getClass().getSimpleName());
+            }
+
             future = null;
             super.doStop();
         }

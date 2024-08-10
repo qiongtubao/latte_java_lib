@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
-import latte.lib.common.concurrent.LatteScheduledThreadPoolExecutor;
+import latte.lib.common.thread.LatteScheduledThreadPoolExecutor;
 
 
 public abstract class AbstractQpsTask extends AbstractTask {

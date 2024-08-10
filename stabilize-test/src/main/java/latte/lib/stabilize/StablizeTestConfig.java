@@ -12,10 +12,9 @@ import lombok.Setter;
 @Getter
 public class StablizeTestConfig extends AbstractDynamicConfigClass {
   Map<String, Map<String, TaskConfig>> tasks;
-  int executorNum = 100;
   int scheduledNum = 100;
-
-
+  int executorMinNum = 1;
+  int executorMaxNum = 100;
   public StablizeTestConfig() {
 
   }
@@ -29,13 +28,17 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
   }
 
   public void exchange(StablizeTestConfig now) {
-    int oldExecutorNum = this.executorNum;
-    this.executorNum = now.executorNum;
-    now.executorNum = oldExecutorNum;
-
-    int oldScheduleNum = this.scheduledNum;
+    int oldScheduledNum = this.scheduledNum;
     this.scheduledNum = now.scheduledNum;
-    now.scheduledNum = oldScheduleNum;
+    now.scheduledNum = oldScheduledNum;
+
+    int oldExecutorMinNum = this.executorMinNum;
+    this.executorMinNum = now.executorMinNum;
+    now.executorMinNum = oldExecutorMinNum;
+
+    int oldExecutorMaxNum = this.executorMaxNum;
+    this.executorMaxNum = now.executorMaxNum;
+    now.executorMaxNum = oldExecutorMaxNum;
 
     Map<String, Map<String,TaskConfig>> oldTasks = this.tasks;
     this.tasks = now.tasks;
@@ -53,8 +56,9 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
     }
     //取巧  all(3) = update executor or scheeduledNum(1) + update tasks(2)
     int result = 0;
-    if (config.executorNum != this.executorNum
-    || config.scheduledNum != this.scheduledNum) {
+    if (config.scheduledNum != this.scheduledNum
+    || config.executorMinNum != this.executorMinNum
+    || config.executorMaxNum != this.executorMaxNum) {
         result += 1;
     }
     if (config.tasks.size() != this.tasks.size()) {
