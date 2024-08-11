@@ -15,6 +15,7 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
   int scheduledNum = 100;
   int executorMinNum = 1;
   int executorMaxNum = 100;
+  int executorQueueNum = 1000000;
   public StablizeTestConfig() {
 
   }
@@ -40,6 +41,10 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
     this.executorMaxNum = now.executorMaxNum;
     now.executorMaxNum = oldExecutorMaxNum;
 
+    int oldExecutorQueueNum = this.executorQueueNum;
+    this.executorQueueNum = now.executorQueueNum;
+    now.executorQueueNum = oldExecutorQueueNum;
+
     Map<String, Map<String,TaskConfig>> oldTasks = this.tasks;
     this.tasks = now.tasks;
     now.tasks = oldTasks;
@@ -58,7 +63,8 @@ public class StablizeTestConfig extends AbstractDynamicConfigClass {
     int result = 0;
     if (config.scheduledNum != this.scheduledNum
     || config.executorMinNum != this.executorMinNum
-    || config.executorMaxNum != this.executorMaxNum) {
+    || config.executorMaxNum != this.executorMaxNum
+    || config.executorQueueNum != this.executorQueueNum) {
         result += 1;
     }
     if (config.tasks.size() != this.tasks.size()) {

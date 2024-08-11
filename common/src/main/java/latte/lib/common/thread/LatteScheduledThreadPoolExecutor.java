@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import latte.lib.common.concurrent.DynamicBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,23 +17,31 @@ public class LatteScheduledThreadPoolExecutor implements ScheduledExecutorServic
   private static final RejectedExecutionHandler DEFAULT_HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
 
   static Logger logger = LoggerFactory.getLogger(LatteScheduledThreadPoolExecutor.class);
-  public LatteScheduledThreadPoolExecutor(String name, int scheduleCorePoolSize, int executorCorePoolSize,int executorMaximumPoolSize, long keepAliveTime) {
+
+  int executorCorePoolSize;
+
+  int executorMaximumPoolSize;
+
+  long keepAliveTime;
+
+  String name;
+
+  int queueNum = 0;
+
+  public LatteScheduledThreadPoolExecutor(String name, int scheduleCorePoolSize, int executorCorePoolSize,int executorMaximumPoolSize, long keepAliveTime, int queueSize) {
 
     this.schedule = MoreExecutors.getExitingScheduledExecutorService(new ScheduledThreadPoolExecutor(
         scheduleCorePoolSize,
         new ThreadFactoryBuilder().setNameFormat("latte-" + name + "-scheduled-%d").build(),
         DEFAULT_HANDLER
     ));
+    this.executorCorePoolSize = executorCorePoolSize;
+    this.executorMaximumPoolSize = executorMaximumPoolSize;
+    this.keepAliveTime = keepAliveTime;
+    this.name = name;
     //当队列数量不满时 不会创建临时线程
-    this.executor = new ThreadPoolExecutor(
-        executorCorePoolSize,
-        executorMaximumPoolSize,
-        keepAliveTime,
-        TimeUnit.SECONDS,
-        new LinkedBlockingQueue<>(10000),
-        LatteThreadFactory.create(String.format("latte-" + name + "-executor")),
-        DEFAULT_HANDLER);
-    logger.info("executorMaximumPoolSize: {}", executorMaximumPoolSize);
+    this.setExecutorQueueNum(queueSize);
+    logger.info("queueNum: {}", queueSize);
   }
 
   public void setScheduleCorePoolSize(int poolSize) {
@@ -43,6 +52,20 @@ public class LatteScheduledThreadPoolExecutor implements ScheduledExecutorServic
 
   public void setExecutorMaximumPoolSize(int poolSize) {
       this.executor.setMaximumPoolSize(poolSize);
+  }
+
+  public void setExecutorQueueNum(int queueNum) {
+    if (this.queueNum != queueNum) {
+      this.queueNum = queueNum;
+      this.executor = new ThreadPoolExecutor(
+          this.executorCorePoolSize,
+          this.executorMaximumPoolSize,
+          this.keepAliveTime,
+          TimeUnit.SECONDS,
+          new DynamicBlockingQueue<>(queueNum),
+          LatteThreadFactory.create(String.format("latte-" + this.name + "-executor")),
+          DEFAULT_HANDLER);
+    }
   }
 
   @Override
@@ -104,8 +127,8 @@ public class LatteScheduledThreadPoolExecutor implements ScheduledExecutorServic
 
   @Override
   public Future<?> submit(Runnable task) {
-    logger.info("[latte] submit {}", executor.getMaximumPoolSize());
     Future<?> future = executor.submit(task);
+//    logger.info("[latte] submit {}", executor.getQueue().size());
     return future;
   }
 

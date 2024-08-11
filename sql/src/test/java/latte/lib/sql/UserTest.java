@@ -1,5 +1,7 @@
 package latte.lib.sql;
 
+import java.util.List;
+import java.util.Map;
 import latte.lib.api.db.sql.SqlClient;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -35,5 +37,59 @@ public abstract class UserTest {
             logger.info("[sql] insert sql :{}", sql);
         }
         client.exec(sql);
+    }
+
+    @Test
+    public void query() throws Exception {
+        SqlClient client = getClient();
+        SqlParser parser = new SqlParser(User.class);
+        User user = new User();
+//        user.age= 100;
+        user.name = "zhangsan";
+        String sql = parser.select(user);
+        if (printSql) {
+            logger.info("[sql] insert sql :{}", sql);
+        }
+        List<Map<String, Object>> rs = client.select(sql);
+        logger.info("{}", rs);
+
+
+
+
+    }
+
+    @Test
+    public void update() throws Exception {
+        SqlClient client = getClient();
+        SqlParser parser = new SqlParser(User.class);
+        User user = new User();
+        user.age= 100;
+        user.name = "zhangsan";
+
+        User user1 = new User();
+        user1.age = 200;
+        String sql = parser.update(user, user1);
+        if (printSql) {
+            logger.info("[sql] update sql :{}", sql);
+        }
+        boolean result = client.exec(sql);
+        logger.info("{}", result);
+
+        //
+        User q = new User();
+//        user.age= 100;
+        q.name = "zhangsan";
+        String qSql = parser.select(q);
+        List<Map<String, Object>> s = client.select(qSql);
+
+        User u = (User) parser.from(s.get(0));
+        logger.info("{}", u);
+
+
+    }
+
+    @Test
+    public void delete() throws Exception {
+
     }
 }

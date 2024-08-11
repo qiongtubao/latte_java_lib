@@ -27,7 +27,8 @@ public class TaskManager {
             config.getScheduledNum(),
             config.getExecutorMinNum(),
             config.getExecutorMaxNum(),
-            60L
+            60L,
+            config.getExecutorQueueNum()
         );
 //        scheduled = new ScheduledThreadPoolExecutor(config.getExecutorNum());
 //        scheduled.setMaximumPoolSize(config.getScheduledNum());
@@ -76,7 +77,7 @@ public class TaskManager {
         this.scheduled.setExecutorMaximumPoolSize(num);
     }
 
-
+    public void setExecutorQueueNum(int num) { this.scheduled.setExecutorQueueNum(num);}
 
     public int updateTasks(Map<String, Map<String, TaskConfig>> config) {
         int result = 0;
