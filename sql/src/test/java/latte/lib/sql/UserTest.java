@@ -90,6 +90,18 @@ public abstract class UserTest {
 
     @Test
     public void delete() throws Exception {
+        SqlClient client = getClient();
+        SqlParser parser = new SqlParser(User.class);
+        User user = new User();
+        user.age= 200;
+        user.name = "zhangsan";
+        String sql = parser.delete(user);
+
+        if (printSql) {
+            logger.info("[sql] update sql :{}", sql);
+        }
+        boolean result = client.exec(sql);
+        logger.info("{}", result);
 
     }
 }

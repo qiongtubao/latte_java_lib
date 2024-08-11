@@ -14,6 +14,7 @@ import latte.lib.api.db.sql.annotation.Ignore;
 import latte.lib.api.db.sql.annotation.Table;
 import latte.lib.api.db.sql.annotation.Type;
 import latte.lib.api.db.sql.ddl.CreateTable;
+import latte.lib.api.db.sql.dml.DeleteTable;
 import latte.lib.api.db.sql.dml.InsertTable;
 import latte.lib.api.db.sql.dml.SelectTable;
 import latte.lib.api.db.sql.dml.UpdateTable;
@@ -21,7 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class SqlParser<T> implements CreateTable, InsertTable<T>, SelectTable<T>, UpdateTable<T> {
+public class SqlParser<T> implements CreateTable, InsertTable<T>, SelectTable<T>, UpdateTable<T>,
+    DeleteTable<T> {
 
     static Logger logger = LoggerFactory.getLogger(SqlParser.class);
 
@@ -155,28 +157,8 @@ public class SqlParser<T> implements CreateTable, InsertTable<T>, SelectTable<T>
         Field[] fields = clazz.getDeclaredFields();
         Table tableAnnotation = (Table) clazz.getAnnotation(Table.class);
         String tableName = tableAnnotation.name();
-        StringBuffer values = new StringBuffer();
-        int index = 0;
-        for(int i = 0; i < fields.length; i++) {
-            fields[i].setAccessible(true); // 允许访问私有字段
-            try {
-                Object value = fields[i].get(obj);
-                if (value == null) continue;
-                if (index != 0) {
-                    values.append(" and ");
-                }
-                values.append(fields[i].getName() + "=" );
-                if (value instanceof String) {
-                    values.append("'" + value + "'");
-                } else if (value != null) {
-                    values.append(value.toString());
-                }
-                index++;
-            } catch (Exception e) {
-                System.out.println(e.toString());
-            }
-        }
-        return "select * from " + tableName + " where " + values;
+        String condition = conditionSql(obj, fields);
+        return "select * from " + tableName + " where " + condition;
     }
 
     @Override
@@ -248,5 +230,38 @@ public class SqlParser<T> implements CreateTable, InsertTable<T>, SelectTable<T>
             }
         }
         return obj;
+    }
+
+    String conditionSql(T obj, Field[] fields) {
+        StringBuffer conditions = new StringBuffer();
+        int index = 0;
+        for(int i = 0; i < fields.length; i++) {
+            fields[i].setAccessible(true); // 允许访问私有字段
+            try {
+                Object value = fields[i].get(obj);
+                if (value == null) continue;
+                if (index != 0) {
+                    conditions.append(" and ");
+                }
+                conditions.append(fields[i].getName() + "=" );
+                if (value instanceof String) {
+                    conditions.append("'" + value + "'");
+                } else if (value != null) {
+                    conditions.append(value.toString());
+                }
+                index++;
+            } catch (Exception e) {
+                logger.error("[latte] condition sql:",e);
+            }
+        }
+        return conditions.toString();
+    }
+    @Override
+    public String delete(T obj) {
+        Class<?> clazz = obj.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        Table tableAnnotation = (Table) clazz.getAnnotation(Table.class);
+        String tableName = tableAnnotation.name();
+        return "delete from " + tableName + " where " + conditionSql(obj, fields);
     }
 }
