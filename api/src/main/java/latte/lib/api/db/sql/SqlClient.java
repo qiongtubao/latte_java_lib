@@ -7,4 +7,6 @@ import java.util.Map;
 public interface SqlClient {
     boolean exec(String sql);
     List<Map<String,Object>> select(String sql);
+
+    boolean supportInsertOrUpdate();
 }

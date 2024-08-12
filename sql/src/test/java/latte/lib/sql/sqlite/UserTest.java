@@ -15,11 +15,11 @@ public class UserTest extends latte.lib.sql.UserTest {
     public void createTable() throws Exception {
        super.createTable();
     }
-  private static final String DB_URL = "jdbc:sqlite:test.db";
+  private static final String DB_FILE = "jdbc:sqlite:test.db";
   @Override
   protected SqlClient getClient() throws Exception {
       return SqliteClient
-          .createSqliteClient(DB_URL);
+          .createSqliteClient(DB_FILE);
   }
 
   @Test
