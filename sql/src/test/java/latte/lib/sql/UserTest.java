@@ -3,6 +3,7 @@ package latte.lib.sql;
 import java.util.List;
 import java.util.Map;
 import latte.lib.api.db.sql.SqlClient;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,6 @@ public abstract class UserTest {
         client.exec(sql);
     }
 
-    @Test
     public void query() throws Exception {
         SqlClient client = getClient();
         SqlParser parser = new SqlParser(User.class);
@@ -58,7 +58,6 @@ public abstract class UserTest {
 
     }
 
-    @Test
     public void update() throws Exception {
         SqlClient client = getClient();
         SqlParser parser = new SqlParser(User.class);
@@ -88,7 +87,6 @@ public abstract class UserTest {
 
     }
 
-    @Test
     public void delete() throws Exception {
         SqlClient client = getClient();
         SqlParser parser = new SqlParser(User.class);
@@ -102,6 +100,76 @@ public abstract class UserTest {
         }
         boolean result = client.exec(sql);
         logger.info("{}", result);
+
+    }
+
+    public void insertOrUpdate() throws Exception {
+        SqlClient client = getClient();
+        SqlParser parser = new SqlParser(User.class);
+        User user = new User();
+        user.age= 200;
+        user.name = "zhangsan";
+        String sql = parser.insertOrUpdate(user);
+
+        if (printSql) {
+            logger.info("[sql] update sql :{}", sql);
+        }
+        boolean result = client.exec(sql);
+        logger.info("{}", result);
+
+
+
+    }
+
+    public void all() throws Exception {
+        SqlClient client = getClient();
+        SqlParser<User> parser = new SqlParser(User.class);
+        User selectUser = new User();
+        selectUser.name = "zhangsan";
+        String sql = parser.select(selectUser);
+        if (printSql) {
+            logger.info("[sql] select sql :{}", sql);
+        }
+        Assert.assertEquals(client.select(sql).size(), 0);
+        User user = new User();
+        user.id = 1;
+        user.age= 200;
+        user.name = "zhangsan";
+        sql = parser.insert(user);
+        if (printSql) {
+            logger.info("[sql] insert sql :{}", sql);
+        }
+        client.exec(sql);
+        List<Map<String, Object>> listr = client.select(parser.select(selectUser));
+        Assert.assertEquals(listr.size(), 1);
+        User u = parser.from(listr.get(0));
+        Assert.assertEquals(u, user);
+
+        User user2 = new User();
+        user2.age = 100;
+        sql = parser.update(user, user2);
+        if(printSql) {
+            logger.info("[sql] update sql :{}", sql);
+        }
+        client.exec(sql);
+
+        listr = client.select(parser.select(selectUser));
+        Assert.assertEquals(listr.size(), 1);
+        u = parser.from(listr.get(0));
+        user.age = 100;
+        Assert.assertEquals(u, user);
+
+        sql = parser.delete(user2);
+        if (printSql) {
+            logger.info("[sql] delete sql :{}", sql);
+        }
+
+        client.exec(sql);
+        listr = client.select(parser.select(selectUser));
+        Assert.assertEquals(listr.size(), 0);
+//
+
+
 
     }
 }
