@@ -9,4 +9,6 @@ public interface SqlClient {
     List<Map<String,Object>> select(String sql);
 
     boolean supportInsertOrUpdate();
+
+    void close() throws Exception ;
 }

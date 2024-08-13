@@ -25,11 +25,13 @@ public abstract class AbstractTimerTask extends AbstractTask{
 
     @Override
     public void doStart() {
-        long interval = TimeUnit.SECONDS.toNanos(1) / qps;
-        future = scheduled.scheduleAtFixedRate(() -> {
-            scheduled.submit(doTest());
-        }, 0, interval, TimeUnit.NANOSECONDS);
-        super.doStart();
+        if (qps != 0) {
+            long interval = TimeUnit.SECONDS.toNanos(1) / qps;
+            future = scheduled.scheduleAtFixedRate(() -> {
+                scheduled.submit(doTest());
+            }, 0, interval, TimeUnit.NANOSECONDS);
+            super.doStart();
+        }
     }
 
     @Override

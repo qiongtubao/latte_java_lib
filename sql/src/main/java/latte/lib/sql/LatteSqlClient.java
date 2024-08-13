@@ -21,7 +21,11 @@ public abstract class LatteSqlClient implements SqlClient {
     @Override
     public boolean exec(String sql) {
       try (Statement stmt = conn.createStatement()) {
-        return stmt.execute(sql);
+        if(!stmt.execute(sql)) {
+          return stmt.getUpdateCount() == 0? false: true;
+        } else {
+          throw  new RuntimeException("[sqlClient] select sql should use select function: " + sql);
+        }
       } catch (SQLException e) {
         throw new RuntimeException(e);
       }
@@ -48,4 +52,10 @@ public abstract class LatteSqlClient implements SqlClient {
         throw new RuntimeException(e);
       }
     }
+
+
+  @Override
+  public void close() throws Exception {
+      conn.close();
+  }
 }
