@@ -12,9 +12,7 @@ public class RandomUtils {
     return result;
   }
 
-  static public int randomInt(int min, int max) {
-      return random.nextInt(max - min) + min;
-  }
+
 
   static public String randomString(int size) {
     return new String(randomBytes(size));

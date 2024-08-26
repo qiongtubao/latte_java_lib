@@ -14,7 +14,7 @@ public class TikvClientFactory {
   public synchronized TiSession get(TikvClientInfo clientInfo) {
     TiSession session = sessions.get(clientInfo);
     if (session == null) {
-      session = clientInfo.getType().createTiSession(clientInfo.getPdAddr());
+      session = clientInfo.getType().createTiSession(clientInfo.getPdAddr(), clientInfo.getTimeout());
       sessions.put(clientInfo, session);
     }
     return session;
@@ -26,7 +26,7 @@ public class TikvClientFactory {
   }
 
   static public KVClient createClient(TikvClientInfo info) throws Exception {
-    return info.getType().getClient(info.getType().createTiSession(info.getPdAddr()));
+    return info.getType().getClient(info.getType().createTiSession(info.getPdAddr(), info.getTimeout()));
   }
 
 }

@@ -4,9 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+import latte.lib.common.utils.RandomUtils;
 import latte.lib.stabilize.task.util.RandomPool;
-import latte.lib.stabilize.task.util.RandomUtils;
-
 public class DefaultRandomPool<T> implements RandomPool<T> {
 
   List<T> pool;

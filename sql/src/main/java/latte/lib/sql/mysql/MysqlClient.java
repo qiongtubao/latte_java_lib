@@ -15,7 +15,17 @@ public class MysqlClient extends LatteSqlClient {
     super(conn);
   }
 
-  public static MysqlClient createSqliteClient(String address, int port, String database, String username, String password) throws Exception {
+
+  public static MysqlClient createMysqlClient(MysqlClientInfo info) throws Exception {
+    return createMysqlClient(
+        info.getAddress(),
+        info.getPort(),
+        info.getDatabase(),
+        info.getUsername(),
+        info.getPassword()
+        );
+  }
+  public static MysqlClient createMysqlClient(String address, int port, String database, String username, String password) throws Exception {
     String url = String.format("jdbc:mysql://%s:%d/%s", address, port, database);
     Connection conn = null;
     try {

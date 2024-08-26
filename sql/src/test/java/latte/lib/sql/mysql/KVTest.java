@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class KVTest {
   protected SqlClient getClient() throws Exception {
     return MysqlClient
-        .createSqliteClient(
+        .createMysqlClient(
             "bbzmysqltest.mysql.db.fat.qa.nt.ctripcorp.com",
                 55111,
           "bbzmysqltestdb",

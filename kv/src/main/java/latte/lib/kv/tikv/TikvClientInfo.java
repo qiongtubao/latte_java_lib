@@ -17,10 +17,12 @@ public class TikvClientInfo {
     static public  enum TikvType {
         RAW("raw") {
             @Override
-            TiSession createTiSession(String pdAddr) {
+            TiSession createTiSession(String pdAddr, int timeout) {
                 TiConfiguration conf = TiConfiguration.createRawDefault(pdAddr);
                 conf.setApiVersion(TiConfiguration.ApiVersion.V2);
                 conf.setEnableAtomicForCAS(true);
+                //tikv.grpc.timeout_in_ms
+                conf.setTimeout(timeout);
                 TiSession session = TiSession.create(conf);
                 return session;
             }
@@ -33,7 +35,7 @@ public class TikvClientInfo {
         },
         CTX("ctx") {
             @Override
-            TiSession createTiSession(String pdAddr) {
+            TiSession createTiSession(String pdAddr, int timeout) {
                 return null;
             }
 
@@ -51,7 +53,7 @@ public class TikvClientInfo {
         public String toString() {
             return name;
         }
-        abstract TiSession createTiSession(String pdAddr);
+        abstract TiSession createTiSession(String pdAddr, int timeout);
         abstract KVClient getClient(TiSession session);
         @JsonCreator
         public static TikvType fromString(String name) {
@@ -70,5 +72,7 @@ public class TikvClientInfo {
     }
 
     TikvType type;
+
+    int timeout;
 
 }
