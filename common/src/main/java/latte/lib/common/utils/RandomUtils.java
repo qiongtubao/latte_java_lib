@@ -21,4 +21,8 @@ public class RandomUtils {
         }
         return sb.toString();
     }
+
+    static public int randomInt(int min, int max) {
+        return random.nextInt(max - min) + min;
+    }
 }
