@@ -18,6 +18,7 @@
         <module>config</module>
         <module>kv</module>
       <module>sql</module>
+      <module>grpc</module>
     </modules>
 
     <properties>
