@@ -54,6 +54,8 @@ public class DefaultObkvClient implements KVClient {
 //      long rows = client.insertOrUpdate(tableName, key, new String[]{valName}, new Object[]{value});
       MutationResult result = client.insertOrUpdate(tableName).setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))))
           .addMutateColVal(colVal(valName, value.getBytes(StandardCharsets.UTF_8))).execute();
+//      MutationResult result = client.update(tableName).setRowKey(row(colVal("key", key.getBytes(StandardCharsets.UTF_8))))
+//          .addMutateColVal(colVal(valName, value.getBytes(StandardCharsets.UTF_8))).execute();
       if (result.getAffectedRows() != 1) {
         logger.error("[obkv-set]fail to put kv data, rows != 1");
         return false;

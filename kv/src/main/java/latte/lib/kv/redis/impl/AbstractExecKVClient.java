@@ -4,12 +4,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import latte.lib.api.kv.KVClient;
 import latte.lib.tikv.impl.AbstractKVClient;
 
 public abstract class AbstractExecKVClient implements KVClient {
 
-  abstract Object execCommand(String... args);
+  protected abstract Object execCommand(String... args)
+      throws ExecutionException, InterruptedException;
   @Override
   public boolean del(String key) throws Exception {
     return (boolean) execCommand("del", key);

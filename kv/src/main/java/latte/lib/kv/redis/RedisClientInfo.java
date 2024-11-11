@@ -11,6 +11,7 @@ public class RedisClientInfo {
   int timeout;
   int maxIdle;
   int maxTotal;
+  String uri = "";
 //  int db = 0;
 //  String password;
 }
